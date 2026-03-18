@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COFAS — Outil MJ Unifié</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --stone:#1C1A17;--stone2:#252118;--stone3:#2C2720;--iron:#3A342B;
+  --parch:#E8DCC8;--parch2:#D4C5A0;--parch3:#B8A878;
+  --gold:#B8973A;--gl:#D4AF37;--gl2:#F0CC55;
+  --blood:#8B1A1A;--ember:#C0392B;
+  --txt:#E8DCC8;--txt2:#C4B494;--txt3:#9A8C78;
+  --sh:rgba(0,0,0,0.5);--bdr:rgba(184,151,58,0.35);--bdr2:rgba(184,151,58,0.18);
+  --green:#2d7a3e;--green2:#6dca8a;--red2:#e07070;--orange:#e0a030;
+  --nav-h:56px;--subnav-h:42px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--stone);font-family:'Crimson Text',Georgia,serif;color:var(--txt);min-height:100vh;
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(184,151,58,.06) 0%,transparent 60%),
+  url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23B8973A' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+.site-header{text-align:center;padding:1.2rem 1rem .8rem;background:linear-gradient(180deg,rgba(28,26,23,1) 0%,rgba(37,33,24,.95) 100%);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50;}
+.site-header h1{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gl);letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 30px rgba(212,175,55,.3);}
+.site-header p{font-size:.78rem;color:var(--txt3);font-style:italic;margin-top:.15rem;}
+.dv{height:1px;background:linear-gradient(to right,transparent,var(--gold),var(--gl2),var(--gold),transparent);margin:.4rem auto;max-width:320px;box-shadow:0 0 8px rgba(212,175,55,.2);}
+.main-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:2px;background:rgba(28,26,23,.98);border-bottom:2px solid var(--bdr);padding:.3rem .5rem 0;position:sticky;top:var(--nav-h);z-index:49;}
+.main-tab{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;padding:.6rem 1.4rem;cursor:pointer;color:var(--txt3);background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
+.main-tab:hover{color:var(--gl);}.main-tab.active{color:var(--gl);border-bottom-color:var(--gl);}
+.sub-nav{display:flex;flex-wrap:wrap;gap:2px;background:rgba(37,33,24,.97);border-bottom:1px solid var(--bdr2);padding:.25rem .8rem 0;position:sticky;top:calc(var(--nav-h) + 44px);z-index:48;}
+.sub-tab{font-family:'Cinzel',serif;font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;padding:.45rem 1rem;cursor:pointer;color:var(--txt3);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;white-space:nowrap;}
+.sub-tab:hover{color:var(--parch2);}.sub-tab.active{color:var(--gl2);border-bottom-color:var(--gl2);}
+.inner-tabs{display:flex;gap:4px;margin-bottom:1rem;}
+.inner-tab{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.35rem .9rem;cursor:pointer;color:var(--txt3);background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);border-radius:2px 2px 0 0;transition:all .15s;}
+.inner-tab:hover{color:var(--parch2);border-color:var(--gold);}
+.inner-tab.active{color:var(--gl);background:rgba(184,151,58,.12);border-color:var(--gold);border-bottom-color:transparent;}
+.inner-panel{display:none;}.inner-panel.active{display:block;}
+.main-page{display:none;}.main-page.active{display:block;}
+.sub-page{display:none;}.sub-page.active{display:block;}
+.page-wrap{max-width:1100px;margin:0 auto;padding:1.4rem 1rem 5rem;}
+.card{background:linear-gradient(145deg,#2E2820,#252118);border:1px solid var(--bdr);border-radius:3px;padding:1.1rem 1.3rem;margin-bottom:1rem;box-shadow:0 6px 24px var(--sh),inset 0 1px 0 rgba(212,175,55,.08);position:relative;}
+.card::before{content:'';position:absolute;inset:4px;border:1px solid var(--bdr2);border-radius:2px;pointer-events:none;}
+.ct{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;color:var(--gl);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.8rem;padding-bottom:.45rem;border-bottom:1px solid var(--bdr);}
+.fl{font-family:'Cinzel',serif;font-size:.67rem;font-weight:600;color:var(--parch3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;background:#1A1814;border:1px solid rgba(184,151,58,.4);border-radius:2px;padding:.38rem .6rem;font-family:'Crimson Text',Georgia,serif;font-size:.9rem;color:var(--txt);outline:none;transition:border-color .2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--gl);}
+input::placeholder,textarea::placeholder{color:var(--txt3);font-style:italic;}
+input[type=date]{color-scheme:dark;}
+input[type=color]{width:100%;height:36px;padding:2px 4px;background:#1A1814;border:1px solid rgba(184,151,58,.4);border-radius:2px;cursor:pointer;}
+input[type=range]{width:100%;accent-color:var(--gl);background:transparent;cursor:pointer;}
+textarea{resize:vertical;min-height:52px;}
+select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23D4AF37'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
+.ab{background:none;border:1px dashed rgba(184,151,58,.3);border-radius:2px;padding:.32rem .6rem;font-family:'Crimson Text',Georgia,serif;font-size:.82rem;color:var(--txt3);cursor:pointer;transition:all .15s;font-style:italic;width:100%;margin-top:.3rem;}
+.ab:hover{border-color:var(--gold);color:var(--parch2);}
+.rm{background:none;border:none;cursor:pointer;color:var(--blood);font-size:.9rem;padding:.1rem .3rem;transition:color .15s;}
+.rm:hover{color:var(--ember);}
+.rc{background:linear-gradient(160deg,#1A1814,#131210);border:1px solid var(--bdr);border-radius:3px;padding:1.3rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.rc::before{content:'';position:absolute;inset:4px;border:1px solid var(--bdr2);border-radius:2px;pointer-events:none;}
+.rl{font-family:'Cinzel',serif;font-size:.68rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:.3rem;text-align:center;}
+.ra{font-family:'Crimson Text',Georgia,serif;font-size:.95rem;color:var(--gl);font-style:italic;margin-bottom:.9rem;min-height:1.2em;text-align:center;}
+.rm2{display:flex;align-items:center;justify-content:center;gap:2rem;margin-bottom:1rem;}
+.sn{font-family:'Cinzel',serif;font-size:3.8rem;font-weight:700;color:var(--gl);line-height:1;display:block;transition:all .3s;text-shadow:0 0 20px rgba(212,175,55,.3);}
+.ss-label{font-size:.78rem;color:var(--txt3);font-style:italic;}
+.pn{font-family:'Cinzel',serif;font-size:2.6rem;font-weight:600;line-height:1;display:block;transition:all .3s;}
+.ph{color:var(--green2);}.pm{color:var(--gl);}.pl{color:var(--red2);}
+.rdiv{width:1px;height:55px;background:rgba(184,151,58,.3);}
+.pb-wrap{margin:.6rem 0 0;background:rgba(255,255,255,.06);border-radius:2px;height:6px;overflow:hidden;}
+.pb{height:100%;border-radius:2px;transition:width .4s ease,background .4s;}
+.ss-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--bdr2);}
+.ss-title{font-family:'Cinzel',serif;font-size:.66rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em;text-align:center;margin-bottom:.7rem;}
+.sbar-row{display:grid;grid-template-columns:90px 1fr 28px;gap:.4rem;align-items:center;margin-bottom:.3rem;}
+.sbl{font-family:'Cinzel',serif;font-size:.6rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em;text-align:right;}
+.sbt{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;}
+.sbf{height:100%;border-radius:3px;transition:width .4s;}
+.sbf-g{background:linear-gradient(to right,#2d7a3e,#6dca8a);}
+.sbf-a{background:linear-gradient(to right,#9a7b2e,#D4AF37);}
+.sbf-r{background:linear-gradient(to right,#8b1a1a,#e07070);}
+.sbv{font-family:'Cinzel',serif;font-size:.66rem;font-weight:600;text-align:center;}
+.sbv-g{color:var(--green2);}.sbv-a{color:var(--gl);}.sbv-r{color:var(--red2);}
+.decomp-row{display:flex;justify-content:space-between;padding:.2rem .5rem;border-radius:2px;background:rgba(0,0,0,.15);margin-bottom:.2rem;}
+.decomp-final{background:rgba(184,151,58,.15);border:1px solid rgba(184,151,58,.25);margin-top:.3rem;}
+.dvl{font-size:.77rem;color:var(--txt3);font-style:italic;}
+.dvv{font-family:'Cinzel',serif;font-size:.75rem;font-weight:600;}
+.dvv-n{color:var(--green2);}.dvv-p{color:var(--red2);}.dvv-z{color:var(--txt3);}.dvv-f{color:var(--gl);font-size:.88rem;}
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;}
+.diff-btn{border:2px solid transparent;border-radius:3px;padding:.65rem .4rem;cursor:pointer;text-align:center;transition:all .18s;background:rgba(0,0,0,.2);}
+.diff-btn .dl{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.1rem;}
+.diff-btn .ds{font-size:1.4rem;font-weight:600;display:block;line-height:1;}
+.diff-btn .dd{font-size:.7rem;font-style:italic;color:var(--txt3);margin-top:.15rem;display:block;}
+.diff-btn.facile{border-color:rgba(45,122,62,.4);}.diff-btn.facile .dl{color:var(--green);}.diff-btn.facile .ds{color:var(--green2);}
+.diff-btn.facile.active{background:rgba(45,122,62,.15);border-color:var(--green);box-shadow:0 0 0 2px rgba(45,122,62,.2);}
+.diff-btn.moyenne{border-color:rgba(184,151,58,.4);}.diff-btn.moyenne .dl{color:var(--gold);}.diff-btn.moyenne .ds{color:var(--gl);}
+.diff-btn.moyenne.active{background:rgba(184,151,58,.15);border-color:var(--gl);box-shadow:0 0 0 2px rgba(184,151,58,.2);}
+.diff-btn.difficile{border-color:rgba(139,26,26,.5);}.diff-btn.difficile .dl{color:var(--blood);}.diff-btn.difficile .ds{color:var(--ember);}
+.diff-btn.difficile.active{background:rgba(139,26,26,.2);border-color:var(--ember);box-shadow:0 0 0 2px rgba(139,26,26,.2);}
+.carac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.5rem;}
+.carac-btn{border:1px solid rgba(184,151,58,.3);border-radius:2px;padding:.5rem .3rem;cursor:pointer;text-align:center;transition:all .18s;background:rgba(0,0,0,.2);}
+.carac-btn .cbl{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;color:var(--txt3);}
+.carac-btn .cbv{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;color:var(--gl);display:block;line-height:1.2;}
+.carac-btn .cbmod{font-family:'Cinzel',serif;font-size:.6rem;font-weight:700;display:block;line-height:1;margin-top:.1rem;}
+.carac-btn.active{background:rgba(184,151,58,.18);border-color:var(--gl);box-shadow:0 0 0 2px rgba(184,151,58,.15);}
+.carac-btn.active .cbl{color:var(--parch2);}
+.cbmod-neg{color:var(--green2);}.cbmod-pos{color:var(--red2);}.cbmod-zer{color:var(--txt3);}
+.badge{display:inline-block;font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;padding:.2rem .55rem;border-radius:2px;letter-spacing:.04em;}
+.badge-pos{background:rgba(139,26,26,.2);color:var(--red2);border:1px solid rgba(139,26,26,.4);}
+.badge-neg{background:rgba(45,122,62,.15);color:var(--green2);border:1px solid rgba(45,122,62,.4);}
+.badge-zer{background:rgba(184,151,58,.1);color:var(--txt3);border:1px solid var(--bdr);}
+.af-check-list{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.5rem;}
+.af-check-item{display:flex;align-items:center;gap:.6rem;padding:.38rem .6rem;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);border-radius:2px;cursor:pointer;transition:all .15s;}
+.af-check-item:hover{border-color:var(--gold);}
+.af-check-item input[type=checkbox]{accent-color:var(--gl);width:14px;height:14px;flex-shrink:0;}
+.af-check-item .afn{font-size:.88rem;color:var(--txt2);flex:1;}
+.af-check-item .afd{font-size:.75rem;color:var(--txt3);font-style:italic;}
+.tag-atout{font-family:'Cinzel',serif;font-size:.6rem;font-weight:600;text-transform:uppercase;padding:.1rem .4rem;border-radius:2px;background:rgba(45,122,62,.2);color:var(--green2);border:1px solid rgba(45,122,62,.35);white-space:nowrap;}
+.tag-faib{font-family:'Cinzel',serif;font-size:.6rem;font-weight:600;text-transform:uppercase;padding:.1rem .4rem;border-radius:2px;background:rgba(139,26,26,.2);color:var(--red2);border:1px solid rgba(139,26,26,.35);white-space:nowrap;}
+.malus-row{display:grid;grid-template-columns:1fr 80px auto;gap:.4rem;align-items:center;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);border-radius:2px;padding:.32rem .5rem;margin-bottom:.32rem;}
+.malus-row input[type=text]{background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.25);padding:.12rem .2rem;font-size:.85rem;color:var(--txt2);}
+.malus-row input[type=number]{background:rgba(139,26,26,.15);border:1px solid rgba(139,26,26,.35);border-radius:2px;padding:.2rem .3rem;font-family:'Cinzel',serif;font-size:.9rem;color:var(--red2);font-weight:600;text-align:center;outline:none;width:100%;}
+.reset-btn{background:none;border:1px solid rgba(184,151,58,.25);border-radius:2px;padding:.42rem 1.2rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);cursor:pointer;transition:all .2s;}
+.reset-btn:hover{border-color:var(--gold);color:var(--parch2);}
+.primary-btn{background:rgba(184,151,58,.2);border:1px solid var(--gold);border-radius:2px;padding:.48rem 1.2rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gl);cursor:pointer;transition:all .2s;}
+.primary-btn:hover{background:rgba(184,151,58,.35);}
+.danger-btn{background:rgba(139,26,26,.1);border:1px solid rgba(139,26,26,.4);border-radius:2px;padding:.4rem 1rem;font-family:'Cinzel',serif;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ember);cursor:pointer;transition:all .2s;}
+.danger-btn:hover{background:rgba(139,26,26,.25);}
+.forum-btn{background:linear-gradient(135deg,rgba(139,26,26,.25),rgba(139,26,26,.12));border:1px solid rgba(139,26,26,.55);border-radius:2px;padding:.52rem 1.4rem;font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#e8a0a0;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;}
+.forum-btn:hover{background:linear-gradient(135deg,rgba(139,26,26,.4),rgba(139,26,26,.22));border-color:var(--ember);}
+.forum-btn:disabled{opacity:.4;cursor:not-allowed;}
+.sticky-bar{display:none;position:sticky;bottom:1rem;margin-top:1.2rem;background:linear-gradient(135deg,#1A1814,#131210);border:1px solid var(--gold);border-radius:3px;padding:.75rem 1.3rem;align-items:center;justify-content:space-between;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+.bdd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.bdd-card{background:linear-gradient(145deg,#2E2820,#252118);border:1px solid var(--bdr);border-radius:3px;padding:1rem 1.1rem;position:relative;box-shadow:0 4px 16px var(--sh);}
+.bdd-card::before{content:'';position:absolute;inset:4px;border:1px solid var(--bdr2);border-radius:2px;pointer-events:none;}
+.bdd-card-name{font-family:'Cinzel',serif;font-size:.9rem;font-weight:700;color:var(--parch);margin-bottom:.1rem;}
+.bdd-card-sub{font-size:.82rem;color:var(--txt3);font-style:italic;}
+.bdd-badge{display:inline-block;font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.13rem .45rem;border-radius:2px;background:rgba(184,151,58,.15);color:var(--gl);border:1px solid var(--bdr2);margin-top:.28rem;}
+.bdd-actions{display:flex;gap:.35rem;margin-top:.65rem;padding-top:.5rem;border-top:1px solid var(--bdr2);}
+.edit-btn{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .55rem;border-radius:2px;cursor:pointer;transition:all .15s;background:rgba(184,151,58,.1);border:1px solid rgba(184,151,58,.35);color:var(--gl);}
+.edit-btn:hover{background:rgba(184,151,58,.22);}
+.del-btn{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .55rem;border-radius:2px;cursor:pointer;transition:all .15s;background:rgba(139,26,26,.08);border:1px solid rgba(139,26,26,.3);color:var(--ember);margin-left:auto;}
+.del-btn:hover{background:rgba(139,26,26,.2);}
+.stat-bars{display:flex;flex-direction:column;gap:.22rem;margin-top:.55rem;}
+.stat-bar-row{display:grid;grid-template-columns:70px 1fr 18px;gap:.35rem;align-items:center;}
+.stat-bar-lbl{font-family:'Cinzel',serif;font-size:.56rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.stat-bar-bg{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;}
+.stat-bar-fill{height:100%;border-radius:3px;}
+.sbf-1{background:#c0392b;}.sbf-2{background:#e07050;}.sbf-3{background:#b8860b;}.sbf-4{background:#2d7a3e;}.sbf-5{background:#1a5c2a;}
+.stat-bar-val{font-family:'Cinzel',serif;font-size:.62rem;font-weight:600;text-align:center;}
+.sv-1{color:#c0392b;}.sv-2{color:#e07050;}.sv-3{color:#b8860b;}.sv-4{color:#2d7a3e;}.sv-5{color:#1a5c2a;}
+.action-slots{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.7rem;}
+.action-slot{background:rgba(0,0,0,.25);border:1px solid rgba(184,151,58,.2);border-radius:2px;padding:.55rem .7rem;transition:border-color .2s;}
+.action-slot.slot-active{border-color:var(--gold);background:rgba(184,151,58,.06);}
+.action-slot.slot-done{border-color:rgba(45,122,62,.5);background:rgba(45,122,62,.07);}
+.slot-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;}
+.slot-check{accent-color:var(--gl);width:15px;height:15px;flex-shrink:0;cursor:pointer;}
+.slot-label{font-family:'Cinzel',serif;font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);}
+.slot-done .slot-label{color:var(--green2);}
+.slot-title-inp{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.2);padding:.18rem .1rem;font-family:'Crimson Text',Georgia,serif;font-size:.85rem;color:var(--txt2);outline:none;}
+.slot-title-inp:focus{border-bottom-color:var(--gl);}
+.slot-title-inp::placeholder{color:var(--txt3);font-style:italic;}
+.slot-dates{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-top:.4rem;}
+.slot-date-lbl{font-family:'Cinzel',serif;font-size:.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--txt3);display:block;margin-bottom:.15rem;}
+.slot-date-inp{background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.15);padding:.1rem .1rem;font-family:'Crimson Text',Georgia,serif;font-size:.78rem;color:var(--txt3);outline:none;width:100%;}
+.slot-date-inp:focus{border-bottom-color:var(--gl);}
+.slot-notes-inp{width:100%;background:transparent;border:none;border-top:1px solid rgba(184,151,58,.12);padding:.3rem .1rem 0;font-family:'Crimson Text',Georgia,serif;font-size:.78rem;color:var(--txt3);outline:none;resize:none;min-height:36px;margin-top:.35rem;}
+.slot-notes-inp:focus{border-top-color:var(--gl);}
+.fb{font-family:'Cinzel',serif;font-size:.6rem;font-weight:600;text-transform:uppercase;padding:.1rem .4rem;border-radius:2px;letter-spacing:.04em;}
+.fb-Vert{background:rgba(46,107,31,.2);color:#6dca8a;border:1px solid rgba(46,107,31,.4);}
+.fb-Rouge{background:rgba(139,0,0,.2);color:#e07070;border:1px solid rgba(139,0,0,.4);}
+.fb-Noire{background:rgba(26,26,62,.3);color:#a0a8e8;border:1px solid rgba(26,26,62,.6);}
+.fb-Neutres{background:rgba(90,90,90,.2);color:#b0b0b0;border:1px solid rgba(90,90,90,.4);}
+.chart-box{position:relative;height:52vh;min-height:320px;width:100%;background:rgba(20,18,15,.6);border:1px solid var(--bdr);border-radius:3px;padding:1rem;margin-bottom:1.5rem;}
+.ranking-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.ranking-col-hd{font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;color:var(--gl);text-align:center;background:rgba(184,151,58,.1);border:1px solid var(--bdr);border-bottom:2px solid var(--gold);border-radius:3px 3px 0 0;padding:.5rem .8rem;}
+.ranking-col-body{border:1px solid var(--bdr);border-top:none;border-radius:0 0 3px 3px;overflow:hidden;}
+.ranking-row{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:.6rem;padding:.55rem .8rem;border-bottom:1px solid var(--bdr2);transition:background .15s;}
+.ranking-row:last-child{border-bottom:none;}
+.ranking-row:hover{background:rgba(184,151,58,.05);}
+.ranking-pos{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;text-align:center;color:var(--txt3);}
+.ranking-pos.gold{color:#c8a84b;}.ranking-pos.silver{color:#a0a8b0;}.ranking-pos.bronze{color:#b8784a;}
+.ranking-name{font-family:'Cinzel',serif;font-size:.72rem;color:var(--parch);}
+.ranking-val{font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;color:var(--gl);white-space:nowrap;}
+.ranking-bar-bg{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin-top:.2rem;}
+.ranking-bar-fill{height:100%;border-radius:2px;}
+.ranking-stat-sel{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;align-items:center;}
+.mini-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.7rem;margin-bottom:1.2rem;}
+.mini-card{background:rgba(0,0,0,.2);border:1px solid var(--bdr2);border-top:3px solid var(--gold);border-radius:3px;padding:.65rem .8rem;cursor:pointer;transition:all .18s;user-select:none;}
+.mini-card:hover{border-color:var(--gold);background:rgba(184,151,58,.06);}
+.mini-card.selected{background:rgba(184,151,58,.12);box-shadow:0 0 0 2px var(--gold);}
+.mini-card h4{font-family:'Cinzel',serif;font-size:.72rem;color:var(--gl);margin-bottom:.4rem;}
+.mini-bar-bg{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin:.2rem 0;}
+.mini-bar-fill{height:100%;border-radius:2px;}
+.carac-edit-row{display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);border-radius:2px;padding:.35rem .55rem;margin-bottom:.35rem;}
+.carac-edit-row input[type=text]{background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.25);padding:.1rem .2rem;font-family:'Cinzel',serif;font-size:.82rem;color:var(--parch);}
+.scale-card{background:linear-gradient(145deg,#2E2820,#252118);border:1px solid var(--bdr);border-top:3px solid var(--gold);border-radius:3px;padding:1rem 1.1rem;margin-bottom:.8rem;}
+.scale-card h3{font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;color:var(--gl);margin-bottom:.8rem;}
+.scale-row{display:grid;grid-template-columns:28px 60px 1fr;gap:.5rem;align-items:center;margin-bottom:.35rem;padding:.25rem 0;border-bottom:1px solid var(--bdr2);}
+.scale-row:last-child{border-bottom:none;}
+.scale-lvl{font-family:'Cinzel',serif;font-weight:700;color:var(--gl);font-size:.8rem;text-align:center;}
+.scale-mod{font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;text-align:center;}
+.scale-desc-inp{width:100%;padding:.28rem .5rem;background:#1A1814;border:1px solid rgba(184,151,58,.3);border-radius:2px;font-size:.78rem;color:var(--txt2);outline:none;}
+.wip-box{text-align:center;padding:4rem 2rem;border:1px dashed rgba(184,151,58,.3);border-radius:4px;background:rgba(0,0,0,.15);margin:2rem auto;max-width:500px;}
+.wip-box .wip-icon{font-size:2.5rem;margin-bottom:.8rem;}
+.wip-box h3{font-family:'Cinzel',serif;font-size:1rem;color:var(--gl);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;}
+.wip-box p{font-size:.88rem;color:var(--txt3);font-style:italic;line-height:1.6;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.mo.open{display:flex;}
+.md{background:linear-gradient(145deg,#2E2820,#252118);border:1px solid var(--bdr);border-radius:4px;padding:1.5rem;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.md-wide{max-width:680px;}
+.mt{font-family:'Cinzel',serif;font-size:.92rem;font-weight:700;color:var(--gl);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.1rem;padding-bottom:.55rem;border-bottom:1px solid var(--bdr);}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.7rem;}
+.mf{display:flex;flex-direction:column;gap:.28rem;}
+.mf.full{grid-column:1/-1;}
+.mf label{font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;color:var(--parch3);text-transform:uppercase;letter-spacing:.07em;}
+.mb{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.9rem;}
+.msb{background:rgba(184,151,58,.2);border:1px solid var(--gold);border-radius:2px;padding:.48rem 1.1rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gl);cursor:pointer;transition:all .2s;}
+.msb:hover{background:rgba(184,151,58,.35);}
+.mcb{background:none;border:1px solid rgba(184,151,58,.25);border-radius:2px;padding:.46rem 1rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);cursor:pointer;}
+.mst{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:var(--gl);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.55rem;}
+.alert{padding:.4rem .8rem;border-radius:2px;font-size:.85rem;font-style:italic;text-align:center;margin-bottom:.6rem;display:none;}
+.alert-err{background:rgba(139,26,26,.15);border:1px solid rgba(139,26,26,.35);color:var(--red2);}
+.alert-ok{background:rgba(45,122,62,.12);border:1px solid rgba(45,122,62,.35);color:var(--green2);}
+.af-select-list{display:flex;flex-direction:column;gap:.3rem;max-height:160px;overflow-y:auto;}
+.af-select-item{display:flex;align-items:center;gap:.5rem;padding:.28rem .5rem;background:rgba(0,0,0,.15);border:1px solid rgba(184,151,58,.15);border-radius:2px;cursor:pointer;transition:all .12s;}
+.af-select-item:hover{border-color:var(--gold);}
+.af-select-item input[type=checkbox]{accent-color:var(--gl);flex-shrink:0;}
+.af-select-item span{font-size:.82rem;color:var(--txt2);}
+.fmo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center;padding:1rem;}
+.fmo.open{display:flex;}
+.fmd{background:linear-gradient(145deg,#2E2820,#1C1A17);border:1px solid var(--bdr);border-radius:4px;padding:1.5rem;width:100%;max-width:660px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.8);}
+.fmd-title{font-family:'Cinzel',serif;font-size:.9rem;font-weight:700;color:var(--gl);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;padding-bottom:.55rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:.6rem;}
+.fmd-label{font-family:'Cinzel',serif;font-size:.67rem;font-weight:600;color:var(--parch3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.32rem;}
+.fmd-input{width:100%;background:#1A1814;border:1px solid rgba(184,151,58,.4);border-radius:2px;padding:.38rem .6rem;font-family:'Crimson Text',Georgia,serif;font-size:.9rem;color:var(--txt);outline:none;transition:border-color .2s;}
+.fmd-input:focus{border-color:var(--gl);}
+.fmd-textarea{width:100%;background:#1A1814;border:1px solid rgba(184,151,58,.4);border-radius:2px;padding:.38rem .6rem;font-family:'Crimson Text',Georgia,serif;font-size:.88rem;color:var(--txt);outline:none;transition:border-color .2s;resize:vertical;min-height:70px;}
+.fmd-textarea:focus{border-color:var(--gl);}
+.seuil-recap{background:rgba(184,151,58,.07);border:1px solid var(--bdr2);border-radius:2px;padding:.5rem .75rem;margin-bottom:.9rem;display:flex;flex-wrap:wrap;gap:.4rem .9rem;align-items:center;}
+.seuil-recap-item{font-size:.8rem;color:var(--txt2);}
+.seuil-recap-item strong{font-family:'Cinzel',serif;color:var(--gl);font-size:.85rem;}
+.seuil-tag{font-family:'Cinzel',serif;font-size:.78rem;font-weight:700;padding:.18rem .55rem;border-radius:2px;background:rgba(184,151,58,.15);color:var(--gl);border:1px solid rgba(184,151,58,.35);}
+.code-output{background:#0D0C0A;border:1px solid rgba(184,151,58,.25);border-radius:2px;padding:.75rem;font-family:monospace;font-size:.72rem;color:#b8c8a8;line-height:1.55;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow-y:auto;margin-top:.5rem;user-select:all;}
+.fmd-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--bdr2);flex-wrap:wrap;}
+.copy-btn{background:rgba(45,122,62,.18);border:1px solid rgba(45,122,62,.45);border-radius:2px;padding:.46rem 1.1rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--green2);cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(45,122,62,.32);}
+.copy-btn.copied{background:rgba(45,122,62,.32);color:#fff;}
+.close-btn2{background:none;border:1px solid rgba(184,151,58,.25);border-radius:2px;padding:.44rem 1rem;font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);cursor:pointer;}
+.close-btn2:hover{border-color:var(--gold);}
+.regen-btn{background:rgba(184,151,58,.1);border:1px solid rgba(184,151,58,.3);border-radius:2px;padding:.44rem .9rem;font-family:'Cinzel',serif;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);cursor:pointer;}
+.regen-btn:hover{border-color:var(--gold);color:var(--parch2);}
+.fm-tab{font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:.38rem .9rem;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);color:var(--txt3);cursor:pointer;transition:all .15s;}
+.fm-tab:first-child{border-radius:2px 0 0 2px;}
+.fm-tab:last-child{border-radius:0 2px 2px 0;margin-left:-1px;}
+.fm-tab.active{background:rgba(184,151,58,.15);border-color:var(--gold);color:var(--gl);}
+.fm-preview-wrap{background:#0e0d0b;border:1px solid rgba(184,151,58,.2);border-radius:3px;padding:.8rem;max-height:320px;overflow-y:auto;}
+.fp-form-tq{background:linear-gradient(135deg,#1a1208,#2a1e08);border:1px solid #5a4010;border-radius:3px 3px 0 0;padding:.75rem 1.1rem .6rem;}
+.fp-form-title{font-family:'Cinzel',serif;font-size:.65rem;font-weight:700;color:#9a7838;text-transform:uppercase;letter-spacing:.22em;text-align:center;margin-bottom:.4rem;}
+.fp-form-subtitle{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;color:#f0e0a0;text-align:center;margin-bottom:.45rem;line-height:1.3;}
+.fp-form-quote{font-size:.9rem;color:#c9a84c;text-align:center;letter-spacing:.06em;}
+.fp-form-body{background:#131009;border:1px solid #3a2c0a;border-top:none;border-radius:0 0 3px 3px;padding:.2rem 0;}
+.fp-block{padding:.65rem 1.1rem;border-bottom:1px solid rgba(90,64,16,.35);}
+.fp-block:last-child{border-bottom:none;}
+.fp-h1{font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;color:#c9a84c;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid rgba(90,64,16,.4);}
+.fp-h1 span{display:inline-block;background:#3a2008;color:#e8c060;font-size:.65rem;border-radius:2px;padding:.05rem .35rem;margin-right:.4rem;}
+.fp-line{margin-bottom:.25rem;line-height:1.55;font-family:Georgia,serif;font-size:.88rem;color:#cfc4b0;}
+.fp-seuil{text-align:center;margin:.5rem 0 .2rem;font-family:'Cinzel',serif;font-size:.92rem;font-weight:700;color:#e8d5a3;}
+.fp-proba{text-align:center;font-size:.75rem;color:#8a7f72;font-style:italic;margin-bottom:.3rem;}
+.fp-palier-label{font-weight:700;font-family:'Cinzel',serif;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem;}
+.fp-palier-effet{color:#b8ae9c;font-size:.83rem;margin-bottom:.5rem;padding-left:.6rem;border-left:2px solid rgba(90,64,16,.5);}
+.fp-cred{font-size:.65rem;color:#5a5040;font-style:italic;text-align:center;padding:.5rem;}
+.empty{text-align:center;padding:3rem 1rem;color:var(--txt3);font-style:italic;grid-column:1/-1;}
+.filter-bar{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem;}
+.filter-bar label{font-family:'Cinzel',serif;font-size:.68rem;color:var(--gl);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;}
+.filter-bar select{width:auto;flex:1;min-width:140px;}
+.af-ref-row{display:grid;grid-template-columns:1fr 90px 1fr auto;gap:.5rem;align-items:center;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.15);border-radius:2px;padding:.35rem .5rem;margin-bottom:.35rem;}
+.af-ref-row input[type=text]{background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.2);padding:.1rem .2rem;font-size:.82rem;color:var(--txt2);}
+.af-ref-row select{background:#1A1814;padding:.18rem .3rem;font-size:.78rem;}
+.palier-row{display:grid;grid-template-columns:1fr 1fr auto;gap:.4rem;align-items:center;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.15);border-radius:2px;padding:.3rem .5rem;margin-bottom:.3rem;}
+.palier-row input[type=text]{background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.2);padding:.1rem .2rem;font-size:.82rem;color:var(--txt2);}
+@media(max-width:700px){
+  .g2,.g3,.ss-grid,.mg,.diff-grid,.ranking-cols{grid-template-columns:1fr;}
+  .carac-grid{grid-template-columns:repeat(2,1fr);}
+  .bdd-grid,.mini-cards-grid{grid-template-columns:1fr;}
+  .action-slots{grid-template-columns:1fr;}
+  .main-tab{padding:.5rem .8rem;font-size:.65rem;}
+  .sub-tab{padding:.38rem .7rem;font-size:.6rem;}
+  .ranking-cols{grid-template-columns:1fr;}
+  .af-ref-row{grid-template-columns:1fr 1fr;grid-template-rows:auto auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="dv"></div>
+  <h1>COFAS</h1>
+  <p>Outil MJ — Interface Unifiée</p>
+  <div class="dv"></div>
+</div>
+
+<nav class="main-nav">
+  <button class="main-tab active" onclick="switchMain('actions',this)">⚔ Actions</button>
+  <button class="main-tab" onclick="switchMain('comparatif',this)">📊 Comparatif</button>
+  <button class="main-tab" onclick="switchMain('bdd',this)">🗄 Base de données</button>
+  <button class="main-tab" onclick="switchMain('params',this)">⚙ Caractéristiques & Paramètres</button>
+</nav>
+
+<!-- ACTIONS -->
+<div class="main-page active" id="page-actions">
+  <div class="sub-nav" id="subnav-actions">
+    <button class="sub-tab active" onclick="switchSub('actions','perso',this)">👤 Action Personnage</button>
+    <button class="sub-tab" onclick="switchSub('actions','maison',this)">🏰 Action Maison</button>
+    <button class="sub-tab" onclick="switchSub('actions','region',this)">🗺 Action Région</button>
+  </div>
+  <div class="sub-page active" id="actions-perso">
+    <div class="page-wrap">
+      <div class="rc">
+        <div class="rl">Action en cours</div>
+        <div class="ra" id="ap-ra">--</div>
+        <div class="rm2">
+          <div style="text-align:center"><span class="sn" id="ap-sn">--</span><span class="ss-label">Seuil final (D20 ≥)</span></div>
+          <div class="rdiv"></div>
+          <div style="text-align:center"><span class="pn pm" id="ap-pn">--</span><span class="ss-label">Chances de succès</span></div>
+        </div>
+        <div class="pb-wrap"><div class="pb" id="ap-pb" style="width:0%"></div></div>
+        <div id="ap-ss-wrap" style="display:none">
+          <div class="ss-grid">
+            <div><div class="ss-title">Barres</div><div id="ap-sbars"></div></div>
+            <div><div class="ss-title">Décomposition</div><div id="ap-decomp"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Nom de l'action</div>
+        <input type="text" id="ap-name" placeholder="Ex : Négocier avec les Manderly..." oninput="apRecalc()">
+      </div>
+      <div class="card"><div class="ct">Difficulté de base</div>
+        <div class="diff-grid">
+          <button class="diff-btn facile" onclick="apSetDiff(6,this)"><span class="dl">Facile</span><span class="ds">6</span><span class="dd">Tâche courante</span></button>
+          <button class="diff-btn moyenne" onclick="apSetDiff(10,this)"><span class="dl">Moyenne</span><span class="ds">10</span><span class="dd">Situation complexe</span></button>
+          <button class="diff-btn difficile" onclick="apSetDiff(14,this)"><span class="dl">Difficile</span><span class="ds">14</span><span class="dd">Situation exceptionnelle</span></button>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Personnage</div>
+        <div class="g2" style="margin-bottom:.7rem">
+          <div><label class="fl">Sélectionner</label>
+            <select id="ap-perso-sel" onchange="apOnPersoChange()"><option value="">-- Aucun --</option></select>
+          </div>
+          <div><label class="fl">Score de Maison (1-10)</label>
+            <select id="ap-maison-score" onchange="apRecalc()">
+              <option value="">-- Aucune --</option>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+            </select>
+            <div id="ap-maison-badge" style="margin-top:.3rem"></div>
+          </div>
+        </div>
+        <label class="fl">Caractéristique utilisée</label>
+        <div class="carac-grid" id="ap-carac-grid"></div>
+        <div id="ap-perso-badge" style="margin-top:.3rem"></div>
+      </div>
+      <div class="card"><div class="ct">Atouts & Faiblesses applicables</div>
+        <div id="ap-af-list"><p style="font-size:.82rem;color:var(--txt3);font-style:italic">Sélectionnez un personnage.</p></div>
+      </div>
+      <div class="card"><div class="ct">Bonus / Malus contextuels</div>
+        <div id="ap-ctx-list"></div>
+        <button class="ab" onclick="apAddCtx()">+ Ajouter un modificateur contextuel</button>
+      </div>
+      <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem">
+        <button class="reset-btn" onclick="apReset()">Réinitialiser</button>
+        <button class="forum-btn" id="ap-forum-btn" onclick="openForumModal('perso')" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+          Générer le code forum
+        </button>
+      </div>
+      <div class="sticky-bar" id="ap-sticky">
+        <div><span style="font-family:'Cinzel',serif;font-size:.63rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em" id="ap-st-act">--</span><br>
+          <span style="font-family:'Cinzel',serif;font-size:.68rem;color:var(--txt3)" id="ap-st-diff">--</span></div>
+        <div style="display:flex;align-items:baseline;gap:.5rem">
+          <span style="font-family:'Cinzel',serif;font-size:.72rem;color:var(--txt3)">D20 ≥</span>
+          <span style="font-family:'Cinzel',serif;font-size:2.2rem;font-weight:700;color:var(--gl);line-height:1" id="ap-st-sn">--</span>
+          <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:600;line-height:1" id="ap-st-pn">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="actions-maison">
+    <div class="page-wrap">
+      <div class="rc">
+        <div class="rl">Action de Maison en cours</div>
+        <div class="ra" id="am-ra">--</div>
+        <div class="rm2">
+          <div style="text-align:center"><span class="sn" id="am-sn">--</span><span class="ss-label">Seuil final (D20 ≥)</span></div>
+          <div class="rdiv"></div>
+          <div style="text-align:center"><span class="pn pm" id="am-pn">--</span><span class="ss-label">Chances de succès</span></div>
+        </div>
+        <div class="pb-wrap"><div class="pb" id="am-pb" style="width:0%"></div></div>
+        <div id="am-ss-wrap" style="display:none">
+          <div class="ss-grid">
+            <div><div class="ss-title">Barres</div><div id="am-sbars"></div></div>
+            <div><div class="ss-title">Décomposition</div><div id="am-decomp"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Nom de l'action</div>
+        <input type="text" id="am-name" placeholder="Ex : Négocier une alliance..." oninput="amRecalc()">
+      </div>
+      <div class="card"><div class="ct">Difficulté de base</div>
+        <div class="diff-grid">
+          <button class="diff-btn facile" onclick="amSetDiff(6,this)"><span class="dl">Facile</span><span class="ds">6</span><span class="dd">Tâche courante</span></button>
+          <button class="diff-btn moyenne" onclick="amSetDiff(10,this)"><span class="dl">Moyenne</span><span class="ds">10</span><span class="dd">Situation complexe</span></button>
+          <button class="diff-btn difficile" onclick="amSetDiff(14,this)"><span class="dl">Difficile</span><span class="ds">14</span><span class="dd">Situation exceptionnelle</span></button>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Maison</div>
+        <div class="g2" style="margin-bottom:.7rem">
+          <div><label class="fl">Sélectionner une maison</label>
+            <select id="am-maison-sel" onchange="amOnMaisonChange()"><option value="">-- Choisir --</option></select>
+          </div>
+          <div style="display:flex;align-items:flex-end"><div id="am-maison-badge"></div></div>
+        </div>
+        <label class="fl">Caractéristiques utilisées <span style="font-style:italic;font-size:.75rem;color:var(--txt3);font-family:'Crimson Text',serif;text-transform:none;letter-spacing:0;font-weight:400">(multi-sélection)</span></label>
+        <div class="carac-grid" id="am-carac-grid"></div>
+      </div>
+      <div class="card"><div class="ct">Personnage Pilote (optionnel)</div>
+        <div class="g2" style="margin-bottom:.7rem">
+          <div><label class="fl">Sélectionner un personnage</label>
+            <select id="am-perso-sel" onchange="amOnPersoChange()"><option value="">-- Aucun --</option></select>
+          </div>
+          <div><label class="fl">Caractéristique utilisée</label>
+            <select id="am-perso-carac" onchange="amRecalc()"><option value="">-- Aucune --</option></select>
+          </div>
+        </div>
+        <div id="am-perso-badge"></div>
+      </div>
+      <div class="card"><div class="ct">Atouts & Faiblesses applicables</div>
+        <div id="am-af-list"><p style="font-size:.82rem;color:var(--txt3);font-style:italic">Sélectionnez un personnage pilote.</p></div>
+      </div>
+      <div class="card"><div class="ct">Bonus / Malus contextuels</div>
+        <div id="am-ctx-list"></div>
+        <button class="ab" onclick="amAddCtx()">+ Ajouter un modificateur contextuel</button>
+      </div>
+      <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem">
+        <button class="reset-btn" onclick="amReset()">Réinitialiser</button>
+        <button class="forum-btn" id="am-forum-btn" onclick="openForumModal('maison')" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+          Générer le code forum
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="actions-region">
+    <div class="page-wrap">
+      <div class="wip-box"><div class="wip-icon">🏗</div>
+        <h3>Action Région — En construction</h3>
+        <p>Cette section sera complétée ultérieurement.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARATIF -->
+<div class="main-page" id="page-comparatif">
+  <div class="sub-nav" id="subnav-comparatif">
+    <button class="sub-tab active" onclick="switchSub('comparatif','regions',this)">🗺 Régions</button>
+    <button class="sub-tab" onclick="switchSub('comparatif','maisons',this)">🏰 Maisons</button>
+    <button class="sub-tab" onclick="switchSub('comparatif','persos',this)">👤 Personnages</button>
+    <button class="sub-tab" onclick="switchSub('comparatif','factions',this)">⚔ Factions</button>
+  </div>
+  <div class="sub-page active" id="comparatif-regions">
+    <div class="page-wrap">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInner('comp-reg','radar',this)">📡 Radar</button>
+        <button class="inner-tab" onclick="switchInner('comp-reg','classement',this)">🏆 Classement</button>
+      </div>
+      <div class="inner-panel active" id="comp-reg-radar">
+        <div style="font-size:.82rem;color:var(--txt3);font-style:italic;margin-bottom:.8rem">Sélectionnez jusqu'à 3 régions à comparer</div>
+        <div class="mini-cards-grid" id="cr-mini-cards"></div>
+        <div class="chart-box"><canvas id="cr-chart"></canvas></div>
+      </div>
+      <div class="inner-panel" id="comp-reg-classement">
+        <div class="ranking-stat-sel" id="cr-rank-selectors"></div>
+        <div class="ranking-cols" id="cr-rank-cols"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="comparatif-maisons">
+    <div class="page-wrap">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInner('comp-mai','radar',this)">📡 Radar</button>
+        <button class="inner-tab" onclick="switchInner('comp-mai','classement',this)">🏆 Classement</button>
+      </div>
+      <div class="inner-panel active" id="comp-mai-radar">
+        <div class="filter-bar">
+          <label>Région :</label>
+          <select id="cm-filter-reg" onchange="cmFilter()"><option value="">Toutes</option></select>
+          <label>Faction :</label>
+          <select id="cm-filter-fac" onchange="cmFilter()">
+            <option value="">Toutes</option><option>Vert</option><option>Rouge</option><option>Noire</option><option>Neutres</option>
+          </select>
+        </div>
+        <div style="font-size:.8rem;color:var(--txt3);font-style:italic;margin-bottom:.6rem">Cochez les maisons à afficher sur le radar</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow-y:auto;padding:.6rem;background:rgba(0,0,0,.2);border:1px solid var(--bdr2);border-radius:3px;margin-bottom:1rem" id="cm-checkboxes"></div>
+        <div class="chart-box"><canvas id="cm-chart"></canvas></div>
+      </div>
+      <div class="inner-panel" id="comp-mai-classement">
+        <div class="ranking-stat-sel" id="cm-rank-selectors"></div>
+        <div class="ranking-cols" id="cm-rank-cols"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="comparatif-persos">
+    <div class="page-wrap">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInner('comp-per','radar',this)">📡 Radar</button>
+        <button class="inner-tab" onclick="switchInner('comp-per','classement',this)">🏆 Classement</button>
+      </div>
+      <div class="inner-panel active" id="comp-per-radar">
+        <div style="font-size:.8rem;color:var(--txt3);font-style:italic;margin-bottom:.6rem">Cochez les personnages à comparer (max 6)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;max-height:180px;overflow-y:auto;padding:.6rem;background:rgba(0,0,0,.2);border:1px solid var(--bdr2);border-radius:3px;margin-bottom:1rem" id="cp-checkboxes"></div>
+        <div class="chart-box"><canvas id="cp-chart"></canvas></div>
+      </div>
+      <div class="inner-panel" id="comp-per-classement">
+        <div class="ranking-stat-sel" id="cp-rank-selectors"></div>
+        <div class="ranking-cols" id="cp-rank-cols"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="comparatif-factions">
+    <div class="page-wrap">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInner('comp-fac','radar',this)">📡 Radar</button>
+        <button class="inner-tab" onclick="switchInner('comp-fac','classement',this)">🏆 Classement</button>
+      </div>
+      <div class="inner-panel active" id="comp-fac-radar">
+        <div class="mini-cards-grid" id="cf-mini-cards"></div>
+        <div class="chart-box"><canvas id="cf-chart"></canvas></div>
+      </div>
+      <div class="inner-panel" id="comp-fac-classement">
+        <div class="ranking-stat-sel" id="cf-rank-selectors"></div>
+        <div class="ranking-cols" id="cf-rank-cols"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BDD -->
+<div class="main-page" id="page-bdd">
+  <div class="sub-nav" id="subnav-bdd">
+    <button class="sub-tab active" onclick="switchSub('bdd','regions',this)">🗺 Régions</button>
+    <button class="sub-tab" onclick="switchSub('bdd','maisons',this)">🏰 Maisons</button>
+    <button class="sub-tab" onclick="switchSub('bdd','persos',this)">👤 Personnages</button>
+  </div>
+  <div class="sub-page active" id="bdd-regions">
+    <div class="page-wrap">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">
+        <button class="primary-btn" onclick="openRegionModal()">+ Nouvelle région</button>
+      </div>
+      <div class="bdd-grid" id="bdd-regions-grid"><div class="empty">Aucune région.</div></div>
+    </div>
+  </div>
+  <div class="sub-page" id="bdd-maisons">
+    <div class="page-wrap">
+      <div class="filter-bar">
+        <label>Région :</label>
+        <select id="bdd-mai-filter" onchange="renderBddMaisons()"><option value="">Toutes</option></select>
+        <button class="primary-btn" style="margin-left:auto" onclick="openMaisonModal()">+ Nouvelle maison</button>
+      </div>
+      <div class="bdd-grid" id="bdd-maisons-grid"><div class="empty">Aucune maison.</div></div>
+    </div>
+  </div>
+  <div class="sub-page" id="bdd-persos">
+    <div class="page-wrap">
+      <div class="filter-bar">
+        <label>Région :</label>
+        <select id="bdd-per-filter-reg" onchange="renderBddPersos()"><option value="">Toutes</option></select>
+        <label>Maison :</label>
+        <select id="bdd-per-filter-mai" onchange="renderBddPersos()"><option value="">Toutes</option></select>
+        <button class="primary-btn" style="margin-left:auto" onclick="openPersoModal()">+ Nouveau personnage</button>
+      </div>
+      <div class="bdd-grid" id="bdd-persos-grid"><div class="empty">Aucun personnage.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PARAMÈTRES -->
+<div class="main-page" id="page-params">
+  <div class="sub-nav" id="subnav-params">
+    <button class="sub-tab active" onclick="switchSub('params','carac-maison',this)">🏰 Carac. Maison</button>
+    <button class="sub-tab" onclick="switchSub('params','carac-perso',this)">👤 Carac. Personnage</button>
+    <button class="sub-tab" onclick="switchSub('params','echelles',this)">⚖ Échelles</button>
+    <button class="sub-tab" onclick="switchSub('params','af',this)">⚜ Atouts & Faiblesses</button>
+  </div>
+  <div class="sub-page active" id="params-carac-maison">
+    <div class="page-wrap">
+      <div class="card"><div class="ct">Caractéristiques de Maison</div>
+        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:.8rem;font-style:italic">Renommer met à jour toutes les maisons. La suppression demande confirmation.</p>
+        <div id="carac-maison-list"></div>
+        <button class="ab" onclick="addCaracMaison()">+ Ajouter une caractéristique de maison</button>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="params-carac-perso">
+    <div class="page-wrap">
+      <div class="card"><div class="ct">Caractéristiques de Personnage</div>
+        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:.8rem;font-style:italic">Total de points imposé : <strong id="perso-total-display" style="color:var(--gl)">18</strong> pts (nb. de carac × 3).</p>
+        <div id="carac-perso-list"></div>
+        <button class="ab" onclick="addCaracPerso()">+ Ajouter une caractéristique de personnage</button>
+      </div>
+    </div>
+  </div>
+  <div class="sub-page" id="params-echelles">
+    <div class="page-wrap"><div id="echelles-content"></div></div>
+  </div>
+  <div class="sub-page" id="params-af">
+    <div class="page-wrap">
+      <div class="card"><div class="ct">Liste de référence</div>
+        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:.8rem;font-style:italic">Atout = −2 au seuil. Faiblesse = +2 au seuil.</p>
+        <div style="display:grid;grid-template-columns:1fr 90px 1fr auto;gap:.5rem;margin-bottom:.4rem">
+          <span class="fl" style="margin:0">Nom</span><span class="fl" style="margin:0">Type</span>
+          <span class="fl" style="margin:0">Description</span><span></span>
+        </div>
+        <div id="af-ref-list"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem">
+          <button class="ab" onclick="addAFRef('atout')">+ Ajouter un atout</button>
+          <button class="ab" onclick="addAFRef('faiblesse')">+ Ajouter une faiblesse</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RÉGION -->
+<div class="mo" id="modal-region" onclick="moClickOut(event,'modal-region')">
+  <div class="md">
+    <div class="mt" id="modal-region-title">Nouvelle région</div>
+    <div class="mg">
+      <div class="mf full"><label>Nom</label><input type="text" id="mr-nom" placeholder="Ex : Le Nord"></div>
+      <div class="mf full"><label>Description</label><textarea id="mr-desc" placeholder="Description..."></textarea></div>
+      <div class="mf">
+        <label>Cohésion %</label>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <input type="range" id="mr-cohpct" min="0" max="100" value="50" oninput="document.getElementById('mr-cohpct-val').textContent=this.value+'%'" style="flex:1">
+          <span id="mr-cohpct-val" style="font-family:'Cinzel',serif;font-size:.82rem;color:var(--gl);min-width:36px">50%</span>
+        </div>
+      </div>
+      <div class="mf"><label>Statut Cohésion</label>
+        <select id="mr-cohstat"><option>Fragmentée</option><option>Tendue</option><option selected>Stable</option><option>Soudée</option><option>Unie</option></select>
+      </div>
+      <div class="mf"><label>Forces Terrestres</label><input type="text" id="mr-terres" placeholder="Ex : 45 000 – 60 000 h."></div>
+      <div class="mf"><label>Forces Navales</label><input type="text" id="mr-navales" placeholder="Ex : 75 – 126 nav."></div>
+    </div>
+    <div class="mb">
+      <button class="mcb" onclick="closeModal('modal-region')">Annuler</button>
+      <button class="msb" onclick="saveRegion()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MAISON -->
+<div class="mo" id="modal-maison" onclick="moClickOut(event,'modal-maison')">
+  <div class="md md-wide">
+    <div class="mt" id="modal-maison-title">Nouvelle maison</div>
+    <div class="mg">
+      <div class="mf full"><label>Nom</label><input type="text" id="mm-nom" placeholder="Ex : Maison Stark"></div>
+      <div class="mf"><label>Région</label><select id="mm-region"></select></div>
+      <div class="mf"><label>Faction</label>
+        <select id="mm-faction">
+          <option value="Vert">Faction Verte</option><option value="Rouge">Faction Rouge</option>
+          <option value="Noire">Faction Noire</option><option value="Neutres" selected>Neutres</option>
+        </select>
+      </div>
+      <div class="mf"><label>Couleur (radar)</label><input type="color" id="mm-couleur" value="#B8973A"></div>
+      <div class="mf full"><label>Description</label><textarea id="mm-desc" placeholder="Description courte..."></textarea></div>
+    </div>
+    <div class="mst">Caractéristiques (1–10)</div>
+    <div id="mm-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:.7rem"></div>
+    <div class="mb">
+      <button class="mcb" onclick="closeModal('modal-maison')">Annuler</button>
+      <button class="msb" onclick="saveMaison()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERSONNAGE -->
+<div class="mo" id="modal-perso" onclick="moClickOut(event,'modal-perso')">
+  <div class="md md-wide">
+    <div class="mt" id="modal-perso-title">Nouveau personnage</div>
+    <div id="perso-alert" class="alert alert-err"></div>
+    <div class="mg">
+      <div class="mf full"><label>Nom complet</label><input type="text" id="mp-nom" placeholder="Prénom Nom..."></div>
+      <div class="mf"><label>Maison</label><select id="mp-maison" onchange="mpMaisonChange()"></select></div>
+      <div class="mf"><label>Région</label><input type="text" id="mp-region" readonly style="opacity:.7"></div>
+    </div>
+    <div class="mst">Caractéristiques — Total : <span id="mp-total" style="color:var(--gl)">0</span> / <span id="mp-total-max">18</span></div>
+    <div id="mp-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:.7rem"></div>
+    <div class="mst" style="margin-top:.5rem">Atouts (max 3)</div>
+    <div class="af-select-list" id="mp-atouts-list"></div>
+    <div class="mst" style="margin-top:.7rem">Faiblesses (max 2)</div>
+    <div class="af-select-list" id="mp-faib-list"></div>
+    <div class="mb">
+      <button class="mcb" onclick="closeModal('modal-perso')">Annuler</button>
+      <button class="msb" onclick="savePerso()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORUM -->
+<div class="fmo" id="forum-modal" onclick="fmoClickOut(event)">
+  <div class="fmd">
+    <div class="fmd-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+      Générer le code Forum
+    </div>
+    <div style="margin-bottom:.8rem"><label class="fmd-label">Personnage / Maison</label><input type="text" class="fmd-input" id="fm-personnage" placeholder="Nom..."></div>
+    <div style="margin-bottom:.8rem"><label class="fmd-label">Titre de l'action</label><input type="text" class="fmd-input" id="fm-titre" placeholder="Ex : Négocier une alliance..."></div>
+    <div style="margin-bottom:.8rem">
+      <label class="fmd-label">Résumé <span style="font-style:italic;font-family:'Crimson Text',serif;font-weight:400;text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--txt3)">(à rédiger)</span></label>
+      <textarea class="fmd-textarea" id="fm-resume" placeholder="Saisissez ici le résumé narratif..." rows="3"></textarea>
+    </div>
+    <div style="margin-bottom:.8rem">
+      <label class="fmd-label">Difficulté <span style="font-style:italic;font-family:'Crimson Text',serif;font-weight:400;text-transform:none;letter-spacing:0;font-size:.75rem;color:var(--txt3)">(auto)</span></label>
+      <div class="seuil-recap" id="fm-diff-recap"><span style="font-size:.82rem;color:var(--txt3);font-style:italic">Aucun calcul.</span></div>
+    </div>
+    <div style="margin-bottom:.8rem">
+      <label class="fmd-label">Réussites & Échecs</label>
+      <div id="fm-paliers-list"></div>
+      <button class="ab" onclick="fmAddPalier()" style="margin-top:.3rem">+ Ajouter un seuil / effet</button>
+    </div>
+    <div style="margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div style="display:flex">
+          <button class="fm-tab active" id="fm-tab-preview" onclick="fmSwitchTab('preview')">Aperçu</button>
+          <button class="fm-tab" id="fm-tab-code" onclick="fmSwitchTab('code')">Code BBCode</button>
+        </div>
+        <button class="regen-btn" onclick="fmGenerate()">↺ Régénérer</button>
+      </div>
+      <div id="fm-preview-panel" class="fm-preview-wrap"><div id="fm-preview-content"></div></div>
+      <div class="code-output" id="fm-code-output" style="display:none"></div>
+    </div>
+    <div class="fmd-actions">
+      <button class="close-btn2" onclick="closeForumModal()">Fermer</button>
+      <button class="copy-btn" id="fm-copy-btn" onclick="fmCopy()">Copier le code</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DONNÉES & PERSISTANCE
+// ═══════════════════════════════════════
+var MOD_M={1:4,2:2,3:1,4:1,5:0,6:0,7:-1,8:-2,9:-3,10:-4};
+var MOD_P={1:3,2:1,3:0,4:-1,5:-3};
+var FACTION_COLORS={'Vert':'rgba(46,107,31,0.8)','Rouge':'rgba(139,0,0,0.8)','Noire':'rgba(26,26,62,0.8)','Neutres':'rgba(90,90,90,0.8)'};
+
+var DB={regions:[],maisons:[],persos:[],af:[],
+  caracMaison:['Terres','Commerce','Population','Influence','Diplomatie','Cohésion','Défensif','Mil. Terrestre','Mil. Naval'],
+  caracPerso:['Militaire','Combattant','Érudit','Politique','Gestionnaire','Intrigant'],
+  echelles:{}};
+
+function loadDB(){
+  var s=localStorage.getItem('cofas_v3');
+  if(s){try{DB=JSON.parse(s);}catch(e){initDefault();}}
+  else{initDefault();}
+  if(!DB.caracMaison||!DB.caracMaison.length)DB.caracMaison=['Terres','Commerce','Population','Influence','Diplomatie','Cohésion','Défensif','Mil. Terrestre','Mil. Naval'];
+  if(!DB.caracPerso||!DB.caracPerso.length)DB.caracPerso=['Militaire','Combattant','Érudit','Politique','Gestionnaire','Intrigant'];
+  if(!DB.echelles)DB.echelles={};
+  if(!DB.af)DB.af=[];
+  if(!DB.persos)DB.persos=[];
+  if(!DB.regions)DB.regions=[];
+  if(!DB.maisons)DB.maisons=[];
+}
+function saveDB(){localStorage.setItem('cofas_v3',JSON.stringify(DB));}
+
+function initDefault(){
+  DB.regions=[
+    {id:1,nom:'Nord',desc:'Vaste territoire au nord de Westeros.',cohesionPct:65,statCohesion:'Stable',forcesTerrestres:'45 000 – 60 000 h.',forcesNavales:'75 – 126 nav.',slots:[{},{} ]},
+    {id:2,nom:'Îles de Fer',desc:'Archipel occidental, marin et guerrier.',cohesionPct:72,statCohesion:'Soudée',forcesTerrestres:'20 000 – 25 000 h.',forcesNavales:'150 – 220 nav.',slots:[{},{}]},
+    {id:3,nom:'Conflans',desc:'Carrefour de Westeros.',cohesionPct:55,statCohesion:'Stable',forcesTerrestres:'25 000 – 35 000 h.',forcesNavales:'30 – 50 nav.',slots:[{},{}]},
+    {id:4,nom:"Val d'Arryn",desc:'Forteresse naturelle du flanc est.',cohesionPct:78,statCohesion:'Soudée',forcesTerrestres:'15 000 – 20 000 h.',forcesNavales:'15 – 30 nav.',slots:[{},{}]},
+    {id:5,nom:'Terres de la Couronne',desc:'Territoire autour de Port-Réal.',cohesionPct:35,statCohesion:'Tendue',forcesTerrestres:'30 000 – 45 000 h.',forcesNavales:'40 – 70 nav.',slots:[{},{}]},
+    {id:6,nom:"Terres de l'Ouest",desc:'Riche en mines, gouverné par les Lannister.',cohesionPct:68,statCohesion:'Stable',forcesTerrestres:'35 000 – 45 000 h.',forcesNavales:'20 – 40 nav.',slots:[{},{}]},
+    {id:7,nom:"Terres de l'Orage",desc:'Terres balayées par les tempêtes.',cohesionPct:60,statCohesion:'Stable',forcesTerrestres:'20 000 – 30 000 h.',forcesNavales:'25 – 45 nav.',slots:[{},{}]},
+    {id:8,nom:'Bief',desc:'Grenier de Westeros, gouverné par les Tyrell.',cohesionPct:72,statCohesion:'Soudée',forcesTerrestres:'80 000 – 100 000 h.',forcesNavales:'170 – 230 nav.',slots:[{},{}]},
+    {id:9,nom:'Dorne',desc:'Terres désertiques du sud.',cohesionPct:82,statCohesion:'Soudée',forcesTerrestres:'20 000 – 30 000 h.',forcesNavales:'30 – 60 nav.',slots:[{},{}]},
+    {id:10,nom:'Peyredragon',desc:'Île volcanique, fief des Targaryen.',cohesionPct:84,statCohesion:'Soudée',forcesTerrestres:'10 000 – 15 000 h.',forcesNavales:'200 – 280 nav.',slots:[{},{}]},
+    {id:11,nom:'Degrés de Pierre',desc:'Archipel turbulent, repaire de pirates.',cohesionPct:45,statCohesion:'Tendue',forcesTerrestres:'5 000 – 10 000 h.',forcesNavales:'80 – 150 nav.',slots:[{},{}]}
+  ];
+  DB.maisons=[
+    {id:101,nom:'Stark',region:'Nord',faction:'Neutres',couleur:'#556B75',desc:"Suzerains du Nord. Que l'hiver vienne.",stats:{Terres:6,Commerce:3,Population:8,Influence:8,Diplomatie:5,Cohésion:8,Défensif:8,'Mil. Terrestre':8,'Mil. Naval':2},slots:[{},{}]},
+    {id:102,nom:'Manderly',region:'Nord',faction:'Neutres',couleur:'#4682B4',desc:'Seigneurs de Blancport.',stats:{Terres:4,Commerce:8,Population:6,Influence:6,Diplomatie:7,Cohésion:7,Défensif:6,'Mil. Terrestre':5,'Mil. Naval':6},slots:[{},{}]},
+    {id:103,nom:'Bolton',region:'Nord',faction:'Neutres',couleur:'#8B0000',desc:'Seigneurs de Fort-Terreur.',stats:{Terres:5,Commerce:3,Population:5,Influence:4,Diplomatie:2,Cohésion:5,Défensif:8,'Mil. Terrestre':5,'Mil. Naval':1},slots:[{},{}]},
+    {id:104,nom:'Karstark',region:'Nord',faction:'Neutres',couleur:'#222222',desc:'Sang des Stark.',stats:{Terres:3,Commerce:2,Population:5,Influence:3,Diplomatie:3,Cohésion:7,Défensif:6,'Mil. Terrestre':5,'Mil. Naval':1},slots:[{},{}]},
+    {id:105,nom:'Mormont',region:'Nord',faction:'Neutres',couleur:'#005000',desc:'Île aux Ours.',stats:{Terres:3,Commerce:3,Population:3,Influence:3,Diplomatie:3,Cohésion:8,Défensif:7,'Mil. Terrestre':2,'Mil. Naval':2},slots:[{},{}]},
+    {id:106,nom:'Greyjoy',region:'Îles de Fer',faction:'Neutres',couleur:'#1E1E1E',desc:'Suzerains des Îles de Fer.',stats:{Terres:2,Commerce:4,Population:4,Influence:5,Diplomatie:3,Cohésion:7,Défensif:8,'Mil. Terrestre':3,'Mil. Naval':7},slots:[{},{}]},
+    {id:107,nom:'Harloi',region:'Îles de Fer',faction:'Neutres',couleur:'#0A3A0A',desc:'Deuxième maison des Îles.',stats:{Terres:2,Commerce:3,Population:3,Influence:4,Diplomatie:3,Cohésion:6,Défensif:6,'Mil. Terrestre':2,'Mil. Naval':5},slots:[{},{}]},
+    {id:108,nom:'Tully',region:'Conflans',faction:'Noire',couleur:'#DC143C',desc:'Seigneurs de Vivesaigues.',stats:{Terres:7,Commerce:5,Population:7,Influence:6,Diplomatie:7,Cohésion:7,Défensif:7,'Mil. Terrestre':6,'Mil. Naval':6},slots:[{},{}]},
+    {id:109,nom:'Frey',region:'Conflans',faction:'Neutres',couleur:'#708090',desc:'Seigneurs du Pont des Jumeaux.',stats:{Terres:5,Commerce:8,Population:6,Influence:5,Diplomatie:4,Cohésion:5,Défensif:7,'Mil. Terrestre':5,'Mil. Naval':3},slots:[{},{}]},
+    {id:110,nom:'Mallister',region:'Conflans',faction:'Noire',couleur:'#4169E1',desc:'Seigneurs de Seagard.',stats:{Terres:5,Commerce:5,Population:5,Influence:5,Diplomatie:5,Cohésion:7,Défensif:6,'Mil. Terrestre':4,'Mil. Naval':5},slots:[{},{}]},
+    {id:111,nom:'Arryn',region:"Val d'Arryn",faction:'Neutres',couleur:'#87CEEB',desc:"Aussi haut que l'honneur.",stats:{Terres:4,Commerce:5,Population:6,Influence:7,Diplomatie:6,Cohésion:8,Défensif:10,'Mil. Terrestre':5,'Mil. Naval':2},slots:[{},{}]},
+    {id:112,nom:'Corbray',region:"Val d'Arryn",faction:'Neutres',couleur:'#B4B4B4',desc:'Seigneurs de Cœur-en-Main.',stats:{Terres:4,Commerce:3,Population:4,Influence:4,Diplomatie:3,Cohésion:6,Défensif:7,'Mil. Terrestre':4,'Mil. Naval':2},slots:[{},{}]},
+    {id:113,nom:'Baratheon (Port-Réal)',region:'Terres de la Couronne',faction:'Vert',couleur:'#FFD700',desc:'Maître du Trône de Fer.',stats:{Terres:5,Commerce:9,Population:8,Influence:10,Diplomatie:7,Cohésion:4,Défensif:7,'Mil. Terrestre':6,'Mil. Naval':6},slots:[{},{}]},
+    {id:114,nom:'Celtigar',region:'Terres de la Couronne',faction:'Noire',couleur:'#8B0000',desc:'Ancienne maison valyrique.',stats:{Terres:4,Commerce:5,Population:4,Influence:4,Diplomatie:4,Cohésion:6,Défensif:6,'Mil. Terrestre':3,'Mil. Naval':5},slots:[{},{}]},
+    {id:115,nom:'Lannister',region:"Terres de l'Ouest",faction:'Vert',couleur:'#FFD700',desc:'Les Lannister paient toujours leurs dettes.',stats:{Terres:7,Commerce:10,Population:7,Influence:9,Diplomatie:8,Cohésion:7,Défensif:9,'Mil. Terrestre':8,'Mil. Naval':4},slots:[{},{}]},
+    {id:116,nom:'Crakehall',region:"Terres de l'Ouest",faction:'Vert',couleur:'#8B6914',desc:'Vassaux des Lannister.',stats:{Terres:5,Commerce:4,Population:5,Influence:4,Diplomatie:4,Cohésion:6,Défensif:6,'Mil. Terrestre':5,'Mil. Naval':2},slots:[{},{}]},
+    {id:117,nom:'Baratheon (Accalmie)',region:"Terres de l'Orage",faction:'Noire',couleur:'#2F4F4F',desc:"Seigneurs de l'Accalmie.",stats:{Terres:6,Commerce:5,Population:6,Influence:7,Diplomatie:5,Cohésion:7,Défensif:8,'Mil. Terrestre':7,'Mil. Naval':4},slots:[{},{}]},
+    {id:118,nom:'Connington',region:"Terres de l'Orage",faction:'Noire',couleur:'#556B2F',desc:'Seigneurs de Griffonmont.',stats:{Terres:4,Commerce:3,Population:4,Influence:4,Diplomatie:4,Cohésion:6,Défensif:5,'Mil. Terrestre':4,'Mil. Naval':2},slots:[{},{}]},
+    {id:119,nom:'Tyrell',region:'Bief',faction:'Vert',couleur:'#228B22',desc:'Seigneurs de Hautjardin.',stats:{Terres:9,Commerce:8,Population:9,Influence:9,Diplomatie:8,Cohésion:8,Défensif:7,'Mil. Terrestre':9,'Mil. Naval':7},slots:[{},{}]},
+    {id:120,nom:'Redwyne',region:'Bief',faction:'Vert',couleur:'#8B0000',desc:'Seigneurs des Arbres.',stats:{Terres:6,Commerce:8,Population:6,Influence:6,Diplomatie:6,Cohésion:7,Défensif:5,'Mil. Terrestre':4,'Mil. Naval':8},slots:[{},{}]},
+    {id:121,nom:'Hightower',region:'Bief',faction:'Vert',couleur:'#F5DEB3',desc:'Seigneurs de Villevieille.',stats:{Terres:7,Commerce:9,Population:7,Influence:7,Diplomatie:8,Cohésion:8,Défensif:8,'Mil. Terrestre':6,'Mil. Naval':7},slots:[{},{}]},
+    {id:122,nom:'Florent',region:'Bief',faction:'Noire',couleur:'#C0C0C0',desc:'Prétendants à Hautjardin.',stats:{Terres:6,Commerce:5,Population:5,Influence:5,Diplomatie:5,Cohésion:6,Défensif:6,'Mil. Terrestre':5,'Mil. Naval':3},slots:[{},{}]},
+    {id:123,nom:'Martell',region:'Dorne',faction:'Neutres',couleur:'#FF8C00',desc:'Princes de Dorne. Non-plié, non-brisé, non-soumis.',stats:{Terres:6,Commerce:5,Population:6,Influence:8,Diplomatie:8,Cohésion:9,Défensif:8,'Mil. Terrestre':5,'Mil. Naval':4},slots:[{},{}]},
+    {id:124,nom:'Dayne',region:'Dorne',faction:'Neutres',couleur:'#9370DB',desc:'Seigneurs du Lapis.',stats:{Terres:4,Commerce:3,Population:4,Influence:4,Diplomatie:4,Cohésion:7,Défensif:6,'Mil. Terrestre':5,'Mil. Naval':2},slots:[{},{}]},
+    {id:125,nom:'Targaryen',region:'Peyredragon',faction:'Noire',couleur:'#8B0000',desc:'Feu et Sang.',stats:{Terres:3,Commerce:6,Population:3,Influence:10,Diplomatie:7,Cohésion:8,Défensif:9,'Mil. Terrestre':5,'Mil. Naval':9},slots:[{},{}]},
+    {id:126,nom:'Velaryon',region:'Peyredragon',faction:'Noire',couleur:'#4169E1',desc:'Seigneurs de Marée.',stats:{Terres:4,Commerce:7,Population:5,Influence:7,Diplomatie:6,Cohésion:8,Défensif:6,'Mil. Terrestre':4,'Mil. Naval':9},slots:[{},{}]},
+    {id:127,nom:'Mooton',region:'Degrés de Pierre',faction:'Vert',couleur:'#8B4513',desc:'Seigneurs de Mosaïque.',stats:{Terres:4,Commerce:4,Population:4,Influence:3,Diplomatie:4,Cohésion:5,Défensif:5,'Mil. Terrestre':3,'Mil. Naval':4},slots:[{},{}]}
+  ];
+  DB.persos=[];
+  DB.af=[
+    {id:201,type:'atout',nom:'Stratège',desc:'Bonus en actions militaires complexes'},
+    {id:202,type:'atout',nom:'Diplomate de renom',desc:'Bonus en négociations diplomatiques'},
+    {id:203,type:'atout',nom:"Réseau d'espions",desc:"Bonus en actions d'intrigue"},
+    {id:204,type:'faiblesse',nom:'Impulsif',desc:'Malus en situations nécessitant de la patience'},
+    {id:205,type:'faiblesse',nom:'Mauvaise réputation',desc:'Malus en actions diplomatiques'}
+  ];
+  DB.echelles={};
+  DB.caracMaison=['Terres','Commerce','Population','Influence','Diplomatie','Cohésion','Défensif','Mil. Terrestre','Mil. Naval'];
+  DB.caracPerso=['Militaire','Combattant','Érudit','Politique','Gestionnaire','Intrigant'];
+  saveDB();
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function switchMain(page,btn){
+  document.querySelectorAll('.main-page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.main-tab').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+page).classList.add('active');
+  btn.classList.add('active');
+  if(page==='bdd'){refreshBddFilters();renderBddRegions();}
+  if(page==='params'){renderCaracMaison();renderCaracPerso();renderEchelles();renderAFRef();}
+  if(page==='comparatif'){initCompRegions();}
+  if(page==='actions'){refreshActionPersoSelects();refreshActionMaisonSelects();}
+}
+function switchSub(page,sub,btn){
+  document.getElementById('subnav-'+page).querySelectorAll('.sub-tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var pages=document.querySelectorAll('#page-'+page+' .sub-page');
+  pages.forEach(function(p){p.classList.remove('active');});
+  document.getElementById(page+'-'+sub).classList.add('active');
+  if(page==='bdd'){
+    if(sub==='regions')renderBddRegions();
+    if(sub==='maisons'){refreshBddFilters();renderBddMaisons();}
+    if(sub==='persos'){refreshBddFilters();renderBddPersos();}
+  }
+  if(page==='comparatif'){
+    if(sub==='regions')initCompRegions();
+    if(sub==='maisons')initCompMaisons();
+    if(sub==='persos')initCompPersos();
+    if(sub==='factions')initCompFactions();
+  }
+  if(page==='params'){
+    if(sub==='carac-maison')renderCaracMaison();
+    if(sub==='carac-perso')renderCaracPerso();
+    if(sub==='echelles')renderEchelles();
+    if(sub==='af')renderAFRef();
+  }
+  if(page==='actions'){
+    if(sub==='perso')refreshActionPersoSelects();
+    if(sub==='maison')refreshActionMaisonSelects();
+  }
+}
+function switchInner(prefix,panel,btn){
+  var container=btn.closest('.page-wrap')||btn.parentElement.parentElement;
+  container.querySelectorAll('.inner-tab').forEach(function(b){b.classList.remove('active');});
+  container.querySelectorAll('.inner-panel').forEach(function(p){p.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById(prefix+'-'+panel).classList.add('active');
+  if(panel==='classement'){
+    if(prefix==='comp-reg')renderRegRanking();
+    if(prefix==='comp-mai')renderMaiRanking();
+    if(prefix==='comp-per')renderPerRanking();
+    if(prefix==='comp-fac')renderFacRanking();
+  }
+  if(panel==='radar'){
+    if(prefix==='comp-reg'){crSelected=[];initCompRegions();}
+    if(prefix==='comp-mai')initCompMaisons();
+    if(prefix==='comp-per')initCompPersos();
+    if(prefix==='comp-fac')initCompFactions();
+  }
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function modBadge(v){
+  var cls=v<0?'badge-neg':v>0?'badge-pos':'badge-zer';
+  var sign=v>0?'+':'';
+  return '<span class="badge '+cls+'">'+sign+v+'</span>';
+}
+function statBarClass10(v){
+  // 1-10 scale
+  if(v<=2)return{bar:'sbf-1',val:'sv-1'};
+  if(v<=4)return{bar:'sbf-2',val:'sv-2'};
+  if(v<=6)return{bar:'sbf-3',val:'sv-3'};
+  if(v<=8)return{bar:'sbf-4',val:'sv-4'};
+  return{bar:'sbf-5',val:'sv-5'};
+}
+function statBarClass5(v){
+  if(v<=1)return{bar:'sbf-1',val:'sv-1'};
+  if(v<=2)return{bar:'sbf-2',val:'sv-2'};
+  if(v<=3)return{bar:'sbf-3',val:'sv-3'};
+  if(v<=4)return{bar:'sbf-4',val:'sv-4'};
+  return{bar:'sbf-5',val:'sv-5'};
+}
+function probColor(pct){if(pct>=65)return'ph';if(pct>=40)return'pm';return'pl';}
+function pbColor(pct){
+  if(pct>=65)return'linear-gradient(to right,#2d7a3e,#6dca8a)';
+  if(pct>=40)return'linear-gradient(to right,#9a7b2e,#D4AF37)';
+  return'linear-gradient(to right,#8b1a1a,#e07070)';
+}
+function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+function regionAvgStats(regionNom){
+  var ms=DB.maisons.filter(function(m){return m.region===regionNom;});
+  if(!ms.length)return null;
+  var res={};
+  DB.caracMaison.forEach(function(c){
+    var s=ms.reduce(function(a,m){return a+(m.stats&&m.stats[c]?+m.stats[c]:5);},0);
+    res[c]=Math.round(s/ms.length*10)/10;
+  });
+  return res;
+}
+function factionAvgStats(faction){
+  var ms=DB.maisons.filter(function(m){return m.faction===faction;});
+  if(!ms.length)return null;
+  var res={};
+  DB.caracMaison.forEach(function(c){
+    var s=ms.reduce(function(a,m){return a+(m.stats&&m.stats[c]?+m.stats[c]:5);},0);
+    res[c]=Math.round(s/ms.length*10)/10;
+  });
+  return res;
+}
+
+// ═══════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════
+var charts={};
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function mkRadar(canvasId,labels,datasets){
+  destroyChart(canvasId);
+  var ctx=document.getElementById(canvasId);
+  if(!ctx)return;
+  charts[canvasId]=new Chart(ctx,{
+    type:'radar',
+    data:{labels:labels,datasets:datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#C4B494',font:{family:"'Cinzel', serif",size:11}}}},
+      scales:{r:{
+        min:0,max:10,
+        angleLines:{color:'rgba(184,151,58,.15)'},
+        grid:{color:'rgba(184,151,58,.12)'},
+        pointLabels:{color:'#C4B494',font:{family:"'Cinzel', serif",size:10}},
+        ticks:{backdropColor:'transparent',color:'#9A8C78',font:{size:9},stepSize:2}
+      }}
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// COMPARATIF — RÉGIONS
+// ═══════════════════════════════════════
+var crSelected=[];
+function initCompRegions(){
+  var grid=document.getElementById('cr-mini-cards');
+  if(!grid)return;
+  grid.innerHTML='';
+  DB.regions.forEach(function(r){
+    var stats=regionAvgStats(r.nom);
+    var avg=stats?parseFloat((Object.values(stats).reduce(function(a,b){return a+b;},0)/DB.caracMaison.length).toFixed(1)):0;
+    var cohPct=r.cohesionPct||50;
+    var card=document.createElement('div');
+    card.className='mini-card'+(crSelected.indexOf(r.id)!==-1?' selected':'');
+    card.innerHTML='<h4>'+h(r.nom)+'</h4>'+
+      '<div style="font-size:.68rem;color:var(--txt3);margin-bottom:.3rem">'+h(r.statCohesion||'')+'</div>'+
+      '<div style="font-size:.65rem;color:var(--txt3)">Moy. stats : <strong style="color:var(--gl)">'+avg+'</strong></div>'+
+      '<div class="mini-bar-bg" style="margin-top:.3rem"><div class="mini-bar-fill" style="width:'+Math.round(avg/10*100)+'%;background:var(--gl)"></div></div>'+
+      '<div style="font-size:.6rem;color:var(--txt3);margin-top:.2rem">Cohésion : <strong style="color:'+(cohPct>=65?'var(--green2)':cohPct>=45?'var(--orange)':'var(--red2)')+'">'+cohPct+'%</strong></div>';
+    (function(rid){card.onclick=function(){
+      var idx=crSelected.indexOf(rid);
+      if(idx!==-1){crSelected.splice(idx,1);}
+      else if(crSelected.length<3){crSelected.push(rid);}
+      initCompRegions();
+    };})(r.id);
+    grid.appendChild(card);
+  });
+  renderRegRadar();
+}
+function renderRegRadar(){
+  var labels=DB.caracMaison;
+  var colors=['#D4AF37','#6dca8a','#e07070'];
+  var datasets=[];
+  crSelected.forEach(function(rid,i){
+    var r=DB.regions.find(function(x){return x.id===rid;});
+    if(!r)return;
+    var stats=regionAvgStats(r.nom);
+    if(!stats)return;
+    var data=labels.map(function(c){return stats[c]||0;});
+    var col=colors[i%colors.length];
+    var colA=col+'40';
+    datasets.push({label:r.nom,data:data,borderColor:col,backgroundColor:colA,pointBackgroundColor:col,borderWidth:2,pointRadius:3});
+  });
+  mkRadar('cr-chart',labels,datasets);
+}
+function renderRegRanking(){
+  var sel=document.getElementById('cr-rank-selectors');
+  var cols=document.getElementById('cr-rank-cols');
+  if(!sel||!cols)return;
+  if(!sel.dataset.built){
+    sel.innerHTML='';
+    [0,1,2].forEach(function(i){
+      var wrap=document.createElement('div');
+      wrap.style.cssText='display:flex;align-items:center;gap:.4rem;';
+      var lbl=document.createElement('span');lbl.className='fl';lbl.style.margin='0';lbl.textContent='Col.'+(i+1)+' :';
+      var sel2=document.createElement('select');
+      sel2.style.cssText='width:auto;min-width:120px;';
+      DB.caracMaison.forEach(function(c,j){
+        var o=document.createElement('option');o.value=c;o.textContent=c;
+        if(j===i)o.selected=true;
+        sel2.appendChild(o);
+      });
+      sel2.onchange=function(){renderRegRanking();};
+      wrap.appendChild(lbl);wrap.appendChild(sel2);
+      sel.appendChild(wrap);
+    });
+    sel.dataset.built='1';
+  }
+  var selects=sel.querySelectorAll('select');
+  cols.innerHTML='';
+  selects.forEach(function(s){
+    var stat=s.value;
+    var sorted=DB.regions.slice().map(function(r){
+      var st=regionAvgStats(r.nom);
+      return{nom:r.nom,val:st?+(st[stat]||0):0};
+    }).sort(function(a,b){return b.val-a.val;});
+    var max=sorted.length?sorted[0].val:1;
+    var col=document.createElement('div');
+    col.innerHTML='<div class="ranking-col-hd">'+h(stat)+'</div><div class="ranking-col-body">'+
+      sorted.map(function(item,i){
+        var posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        var pct=max>0?Math.round(item.val/max*100):0;
+        return '<div class="ranking-row">'+
+          '<div class="ranking-pos '+posClass+'">'+(i+1)+'</div>'+
+          '<div><div class="ranking-name">'+h(item.nom)+'</div>'+
+          '<div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:var(--gl)"></div></div></div>'+
+          '<div class="ranking-val">'+item.val+'</div></div>';
+      }).join('')+'</div>';
+    cols.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════
+// COMPARATIF — MAISONS
+// ═══════════════════════════════════════
+var cmChecked=[];
+function initCompMaisons(){
+  var regSel=document.getElementById('cm-filter-reg');
+  if(regSel&&!regSel.dataset.built){
+    DB.regions.forEach(function(r){
+      var o=document.createElement('option');o.value=r.nom;o.textContent=r.nom;regSel.appendChild(o);
+    });
+    regSel.dataset.built='1';
+  }
+  cmFilter();
+}
+function cmFilter(){
+  var regF=(document.getElementById('cm-filter-reg')||{}).value||'';
+  var facF=(document.getElementById('cm-filter-fac')||{}).value||'';
+  var filtered=DB.maisons.filter(function(m){return(!regF||m.region===regF)&&(!facF||m.faction===facF);});
+  var box=document.getElementById('cm-checkboxes');
+  if(!box)return;
+  box.innerHTML='';
+  filtered.forEach(function(m){
+    var checked=cmChecked.indexOf(m.id)!==-1;
+    var label=document.createElement('label');
+    label.style.cssText='display:flex;align-items:center;gap:4px;padding:2px 6px;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);border-radius:2px;cursor:pointer;font-size:.78rem;color:var(--txt2);';
+    label.innerHTML='<input type="checkbox" '+(checked?'checked':'')+' style="accent-color:var(--gl)"> '+h(m.nom);
+    label.querySelector('input').onchange=function(e){
+      if(e.target.checked){cmChecked.push(m.id);}
+      else{cmChecked=cmChecked.filter(function(x){return x!==m.id;});}
+      renderMaiRadar();
+    };
+    box.appendChild(label);
+  });
+  renderMaiRadar();
+}
+function renderMaiRadar(){
+  var labels=DB.caracMaison;
+  var datasets=cmChecked.map(function(id){
+    var m=DB.maisons.find(function(x){return x.id===id;});
+    if(!m)return null;
+    var data=labels.map(function(c){return m.stats&&m.stats[c]?+m.stats[c]:5;});
+    var col=m.couleur||'#D4AF37';
+    return{label:m.nom,data:data,borderColor:col,backgroundColor:col+'26',pointBackgroundColor:col,borderWidth:2,pointRadius:3};
+  }).filter(Boolean);
+  mkRadar('cm-chart',labels,datasets);
+}
+function renderMaiRanking(){
+  var sel=document.getElementById('cm-rank-selectors');
+  var cols=document.getElementById('cm-rank-cols');
+  if(!sel||!cols)return;
+  if(!sel.dataset.built){
+    [0,1,2].forEach(function(i){
+      var wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:center;gap:.4rem;';
+      var lbl=document.createElement('span');lbl.className='fl';lbl.style.margin='0';lbl.textContent='Col.'+(i+1)+' :';
+      var s=document.createElement('select');s.style.cssText='width:auto;min-width:120px;';
+      DB.caracMaison.forEach(function(c,j){
+        var o=document.createElement('option');o.value=c;o.textContent=c;if(j===i)o.selected=true;s.appendChild(o);
+      });
+      s.onchange=function(){renderMaiRanking();};
+      wrap.appendChild(lbl);wrap.appendChild(s);sel.appendChild(wrap);
+    });
+    sel.dataset.built='1';
+  }
+  var selects=sel.querySelectorAll('select');
+  cols.innerHTML='';
+  selects.forEach(function(s){
+    var stat=s.value;
+    var sorted=DB.maisons.slice().map(function(m){return{nom:m.nom,val:m.stats&&m.stats[stat]?+m.stats[stat]:0};}).sort(function(a,b){return b.val-a.val;});
+    var max=sorted.length?sorted[0].val:1;
+    var col=document.createElement('div');
+    col.innerHTML='<div class="ranking-col-hd">'+h(stat)+'</div><div class="ranking-col-body">'+
+      sorted.map(function(item,i){
+        var posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        var pct=max>0?Math.round(item.val/max*100):0;
+        return '<div class="ranking-row"><div class="ranking-pos '+posClass+'">'+(i+1)+'</div>'+
+          '<div><div class="ranking-name">'+h(item.nom)+'</div><div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:var(--gl)"></div></div></div>'+
+          '<div class="ranking-val">'+item.val+'</div></div>';
+      }).join('')+'</div>';
+    cols.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════
+// COMPARATIF — PERSONNAGES
+// ═══════════════════════════════════════
+var cpChecked=[];
+function initCompPersos(){
+  var box=document.getElementById('cp-checkboxes');
+  if(!box)return;
+  box.innerHTML='';
+  DB.persos.forEach(function(p){
+    var checked=cpChecked.indexOf(p.id)!==-1;
+    var label=document.createElement('label');
+    label.style.cssText='display:flex;align-items:center;gap:4px;padding:2px 6px;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.2);border-radius:2px;cursor:pointer;font-size:.78rem;color:var(--txt2);';
+    label.innerHTML='<input type="checkbox" '+(checked?'checked':'')+' style="accent-color:var(--gl)"> '+h(p.nom);
+    label.querySelector('input').onchange=function(e){
+      if(e.target.checked){if(cpChecked.length<6)cpChecked.push(p.id);}
+      else{cpChecked=cpChecked.filter(function(x){return x!==p.id;});}
+      renderPerRadar();
+    };
+    box.appendChild(label);
+  });
+  renderPerRadar();
+}
+var PER_COLORS=['#D4AF37','#6dca8a','#e07070','#a0a8e8','#e0a030','#e8a0e8'];
+function renderPerRadar(){
+  var labels=DB.caracPerso;
+  var datasets=cpChecked.map(function(id,i){
+    var p=DB.persos.find(function(x){return x.id===id;});
+    if(!p)return null;
+    var data=labels.map(function(c){return p.stats&&p.stats[c]?+p.stats[c]:0;});
+    var col=PER_COLORS[i%PER_COLORS.length];
+    return{label:p.nom,data:data,borderColor:col,backgroundColor:col+'26',pointBackgroundColor:col,borderWidth:2,pointRadius:3};
+  }).filter(Boolean);
+  var canvas=document.getElementById('cp-chart');
+  if(!canvas)return;
+  destroyChart('cp-chart');
+  charts['cp-chart']=new Chart(canvas,{
+    type:'radar',data:{labels:labels,datasets:datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#C4B494',font:{family:"'Cinzel', serif",size:11}}}},
+      scales:{r:{min:0,max:5,angleLines:{color:'rgba(184,151,58,.15)'},grid:{color:'rgba(184,151,58,.12)'},
+        pointLabels:{color:'#C4B494',font:{family:"'Cinzel', serif",size:10}},
+        ticks:{backdropColor:'transparent',color:'#9A8C78',font:{size:9},stepSize:1}}}
+    }
+  });
+}
+function renderPerRanking(){
+  var sel=document.getElementById('cp-rank-selectors');
+  var cols=document.getElementById('cp-rank-cols');
+  if(!sel||!cols)return;
+  if(!sel.dataset.built){
+    [0,1,2].forEach(function(i){
+      var wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:center;gap:.4rem;';
+      var lbl=document.createElement('span');lbl.className='fl';lbl.style.margin='0';lbl.textContent='Col.'+(i+1)+' :';
+      var s=document.createElement('select');s.style.cssText='width:auto;min-width:120px;';
+      DB.caracPerso.forEach(function(c,j){
+        var o=document.createElement('option');o.value=c;o.textContent=c;if(j===i)o.selected=true;s.appendChild(o);
+      });
+      s.onchange=function(){renderPerRanking();};
+      wrap.appendChild(lbl);wrap.appendChild(s);sel.appendChild(wrap);
+    });
+    sel.dataset.built='1';
+  }
+  var selects=sel.querySelectorAll('select');
+  cols.innerHTML='';
+  selects.forEach(function(s){
+    var stat=s.value;
+    var sorted=DB.persos.slice().map(function(p){return{nom:p.nom,val:p.stats&&p.stats[stat]?+p.stats[stat]:0};}).sort(function(a,b){return b.val-a.val;});
+    var max=sorted.length?sorted[0].val:1;
+    var col=document.createElement('div');
+    col.innerHTML='<div class="ranking-col-hd">'+h(stat)+'</div><div class="ranking-col-body">'+
+      (sorted.length?sorted.map(function(item,i){
+        var posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        var pct=max>0?Math.round(item.val/max*100):0;
+        return '<div class="ranking-row"><div class="ranking-pos '+posClass+'">'+(i+1)+'</div>'+
+          '<div><div class="ranking-name">'+h(item.nom)+'</div><div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:var(--gl)"></div></div></div>'+
+          '<div class="ranking-val">'+item.val+'</div></div>';
+      }).join(''):'<div class="empty">Aucun personnage.</div>')+'</div>';
+    cols.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════
+// COMPARATIF — FACTIONS
+// ═══════════════════════════════════════
+var FACTIONS=['Vert','Rouge','Noire','Neutres'];
+var cfSelected=[];
+function initCompFactions(){
+  var grid=document.getElementById('cf-mini-cards');
+  if(!grid)return;
+  grid.innerHTML='';
+  FACTIONS.forEach(function(fac){
+    var stats=factionAvgStats(fac);
+    var avg=stats?parseFloat((Object.values(stats).reduce(function(a,b){return a+b;},0)/DB.caracMaison.length).toFixed(1)):0;
+    var count=DB.maisons.filter(function(m){return m.faction===fac;}).length;
+    var card=document.createElement('div');
+    card.className='mini-card'+(cfSelected.indexOf(fac)!==-1?' selected':'');
+    var col=fac==='Vert'?'#6dca8a':fac==='Rouge'?'#e07070':fac==='Noire'?'#a0a8e8':'#b0b0b0';
+    card.innerHTML='<h4 style="color:'+col+'">'+h(fac)+'</h4>'+
+      '<div style="font-size:.68rem;color:var(--txt3);margin-bottom:.3rem">'+count+' maisons</div>'+
+      '<div style="font-size:.65rem;color:var(--txt3)">Moy. stats : <strong style="color:var(--gl)">'+avg+'</strong></div>'+
+      '<div class="mini-bar-bg" style="margin-top:.3rem"><div class="mini-bar-fill" style="width:'+Math.round(avg/10*100)+'%;background:'+col+'"></div></div>';
+    (function(f){card.onclick=function(){
+      var idx=cfSelected.indexOf(f);
+      if(idx!==-1)cfSelected.splice(idx,1);else cfSelected.push(f);
+      initCompFactions();
+    };})(fac);
+    grid.appendChild(card);
+  });
+  renderFacRadar();
+}
+function renderFacRadar(){
+  var labels=DB.caracMaison;
+  var colMap={'Vert':'rgba(46,139,51,0.9)','Rouge':'rgba(192,57,43,0.9)','Noire':'rgba(80,80,180,0.9)','Neutres':'rgba(130,130,130,0.9)'};
+  var datasets=cfSelected.map(function(fac){
+    var stats=factionAvgStats(fac);
+    if(!stats)return null;
+    var data=labels.map(function(c){return stats[c]||0;});
+    var col=colMap[fac]||'#D4AF37';
+    return{label:fac,data:data,borderColor:col,backgroundColor:col.replace('0.9','0.15'),pointBackgroundColor:col,borderWidth:2,pointRadius:3};
+  }).filter(Boolean);
+  mkRadar('cf-chart',labels,datasets);
+}
+function renderFacRanking(){
+  var sel=document.getElementById('cf-rank-selectors');
+  var cols=document.getElementById('cf-rank-cols');
+  if(!sel||!cols)return;
+  if(!sel.dataset.built){
+    [0,1,2].forEach(function(i){
+      var wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:center;gap:.4rem;';
+      var lbl=document.createElement('span');lbl.className='fl';lbl.style.margin='0';lbl.textContent='Col.'+(i+1)+' :';
+      var s=document.createElement('select');s.style.cssText='width:auto;min-width:120px;';
+      DB.caracMaison.forEach(function(c,j){
+        var o=document.createElement('option');o.value=c;o.textContent=c;if(j===i)o.selected=true;s.appendChild(o);
+      });
+      s.onchange=function(){renderFacRanking();};
+      wrap.appendChild(lbl);wrap.appendChild(s);sel.appendChild(wrap);
+    });
+    sel.dataset.built='1';
+  }
+  var selects=sel.querySelectorAll('select');
+  cols.innerHTML='';
+  selects.forEach(function(s){
+    var stat=s.value;
+    var sorted=FACTIONS.map(function(fac){var st=factionAvgStats(fac);return{nom:fac,val:st?+(st[stat]||0):0};}).sort(function(a,b){return b.val-a.val;});
+    var max=sorted.length?sorted[0].val:1;
+    var col=document.createElement('div');
+    col.innerHTML='<div class="ranking-col-hd">'+h(stat)+'</div><div class="ranking-col-body">'+
+      sorted.map(function(item,i){
+        var posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        var pct=max>0?Math.round(item.val/max*100):0;
+        return '<div class="ranking-row"><div class="ranking-pos '+posClass+'">'+(i+1)+'</div>'+
+          '<div><div class="ranking-name">'+h(item.nom)+'</div><div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:var(--gl)"></div></div></div>'+
+          '<div class="ranking-val">'+item.val.toFixed(1)+'</div></div>';
+      }).join('')+'</div>';
+    cols.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════
+// BDD — RÉGIONS
+// ═══════════════════════════════════════
+var editingRegionId=null;
+function openRegionModal(id){
+  editingRegionId=id||null;
+  var r=id?DB.regions.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-region-title').textContent=r?'Modifier la région':'Nouvelle région';
+  document.getElementById('mr-nom').value=r?r.nom:'';
+  document.getElementById('mr-desc').value=r?r.desc:'';
+  var pct=r?r.cohesionPct:50;
+  document.getElementById('mr-cohpct').value=pct;
+  document.getElementById('mr-cohpct-val').textContent=pct+'%';
+  document.getElementById('mr-cohstat').value=r?r.statCohesion:'Stable';
+  document.getElementById('mr-terres').value=r?r.forcesTerrestres:'';
+  document.getElementById('mr-navales').value=r?r.forcesNavales:'';
+  document.getElementById('modal-region').classList.add('open');
+}
+function saveRegion(){
+  var nom=document.getElementById('mr-nom').value.trim();
+  if(!nom)return;
+  var data={nom:nom,desc:document.getElementById('mr-desc').value,
+    cohesionPct:+document.getElementById('mr-cohpct').value,
+    statCohesion:document.getElementById('mr-cohstat').value,
+    forcesTerrestres:document.getElementById('mr-terres').value,
+    forcesNavales:document.getElementById('mr-navales').value};
+  if(editingRegionId){
+    var r=DB.regions.find(function(x){return x.id===editingRegionId;});
+    if(r)Object.assign(r,data);
+  }else{
+    data.id=Date.now();data.slots=[{},{}];
+    DB.regions.push(data);
+  }
+  saveDB();closeModal('modal-region');renderBddRegions();
+}
+function deleteRegion(id){
+  if(!confirm('Supprimer cette région ?'))return;
+  DB.regions=DB.regions.filter(function(x){return x.id!==id;});
+  saveDB();renderBddRegions();
+}
+function renderBddRegions(){
+  var grid=document.getElementById('bdd-regions-grid');
+  if(!grid)return;
+  if(!DB.regions.length){grid.innerHTML='<div class="empty">Aucune région.</div>';return;}
+  grid.innerHTML=DB.regions.map(function(r){
+    var coh=r.cohesionPct||0;
+    var cohColor=coh>=65?'var(--green2)':coh>=45?'var(--orange)':'var(--red2)';
+    return '<div class="bdd-card">'+
+      '<div class="bdd-card-name">'+h(r.nom)+'</div>'+
+      '<div class="bdd-card-sub">'+h(r.statCohesion||'')+'</div>'+
+      '<div style="margin:.5rem 0"><div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:.2rem"><span style="color:var(--txt3)">Cohésion</span><span style="color:'+cohColor+';font-family:\'Cinzel\',serif;font-weight:700">'+coh+'%</span></div>'+
+      '<div class="pb-wrap"><div class="pb" style="width:'+coh+'%;background:'+pbColor(coh)+'"></div></div></div>'+
+      '<div style="font-size:.78rem;color:var(--txt3);margin:.3rem 0"><span style="color:var(--parch3)">🗡 </span>'+h(r.forcesTerrestres||'—')+'</div>'+
+      '<div style="font-size:.78rem;color:var(--txt3);margin:.2rem 0"><span style="color:var(--parch3)">⚓ </span>'+h(r.forcesNavales||'—')+'</div>'+
+      buildSlotsHTML(r,'region',r.id)+
+      '<div class="bdd-actions">'+
+        '<button class="edit-btn" onclick="openRegionModal('+r.id+')">Modifier</button>'+
+        '<button class="del-btn" onclick="deleteRegion('+r.id+')">Supprimer</button>'+
+      '</div></div>';
+  }).join('');
+  attachSlotEvents('region');
+}
+
+// ═══════════════════════════════════════
+// BDD — MAISONS
+// ═══════════════════════════════════════
+var editingMaisonId=null;
+function openMaisonModal(id){
+  editingMaisonId=id||null;
+  var m=id?DB.maisons.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-maison-title').textContent=m?'Modifier la maison':'Nouvelle maison';
+  document.getElementById('mm-nom').value=m?m.nom:'';
+  var regSel=document.getElementById('mm-region');
+  regSel.innerHTML='';
+  DB.regions.forEach(function(r){var o=document.createElement('option');o.value=r.nom;o.textContent=r.nom;if(m&&m.region===r.nom)o.selected=true;regSel.appendChild(o);});
+  document.getElementById('mm-faction').value=m?m.faction:'Neutres';
+  document.getElementById('mm-couleur').value=m?m.couleur:'#B8973A';
+  document.getElementById('mm-desc').value=m?m.desc:'';
+  var sg=document.getElementById('mm-stats-grid');
+  sg.innerHTML='';
+  DB.caracMaison.forEach(function(c){
+    var v=m&&m.stats?m.stats[c]||5:5;
+    sg.innerHTML+='<div class="mf"><label>'+h(c)+'</label><input type="number" min="1" max="10" value="'+v+'" data-carac="'+h(c)+'"></div>';
+  });
+  document.getElementById('modal-maison').classList.add('open');
+}
+function saveMaison(){
+  var nom=document.getElementById('mm-nom').value.trim();
+  if(!nom)return;
+  var stats={};
+  document.getElementById('mm-stats-grid').querySelectorAll('input').forEach(function(inp){
+    stats[inp.dataset.carac]=clamp(+inp.value,1,10);
+  });
+  var data={nom:nom,region:document.getElementById('mm-region').value,
+    faction:document.getElementById('mm-faction').value,
+    couleur:document.getElementById('mm-couleur').value,
+    desc:document.getElementById('mm-desc').value,stats:stats};
+  if(editingMaisonId){
+    var m=DB.maisons.find(function(x){return x.id===editingMaisonId;});
+    if(m)Object.assign(m,data);
+  }else{
+    data.id=Date.now();data.slots=[{},{}];DB.maisons.push(data);
+  }
+  saveDB();closeModal('modal-maison');renderBddMaisons();
+}
+function deleteMaison(id){
+  if(!confirm('Supprimer cette maison ?'))return;
+  DB.maisons=DB.maisons.filter(function(x){return x.id!==id;});
+  saveDB();renderBddMaisons();
+}
+function renderBddMaisons(){
+  var filter=(document.getElementById('bdd-mai-filter')||{}).value||'';
+  var list=DB.maisons.filter(function(m){return!filter||m.region===filter;});
+  var grid=document.getElementById('bdd-maisons-grid');
+  if(!grid)return;
+  if(!list.length){grid.innerHTML='<div class="empty">Aucune maison.</div>';return;}
+  grid.innerHTML=list.map(function(m){
+    var statBars=DB.caracMaison.map(function(c){
+      var v=m.stats?m.stats[c]||1:1;
+      var cls=statBarClass10(v);
+      return '<div class="stat-bar-row">'+
+        '<div class="stat-bar-lbl">'+h(c)+'</div>'+
+        '<div class="stat-bar-bg"><div class="stat-bar-fill '+cls.bar+'" style="width:'+Math.round(v/10*100)+'%"></div></div>'+
+        '<div class="stat-bar-val '+cls.val+'">'+v+'</div></div>';
+    }).join('');
+    return '<div class="bdd-card">'+
+      '<div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:.3rem">'+
+        '<div><div class="bdd-card-name">'+h(m.nom)+'</div>'+
+        '<div class="bdd-card-sub">'+h(m.region)+'</div></div>'+
+        '<span class="fb fb-'+h(m.faction)+'">'+h(m.faction)+'</span>'+
+      '</div>'+
+      '<div style="font-size:.8rem;color:var(--txt3);font-style:italic;margin-bottom:.5rem">'+h(m.desc||'')+'</div>'+
+      '<div class="stat-bars">'+statBars+'</div>'+
+      buildSlotsHTML(m,'maison',m.id)+
+      '<div class="bdd-actions">'+
+        '<button class="edit-btn" onclick="openMaisonModal('+m.id+')">Modifier</button>'+
+        '<button class="del-btn" onclick="deleteMaison('+m.id+')">Supprimer</button>'+
+      '</div></div>';
+  }).join('');
+  attachSlotEvents('maison');
+}
+function refreshBddFilters(){
+  var maiF=document.getElementById('bdd-mai-filter');
+  if(maiF&&!maiF.dataset.built){
+    DB.regions.forEach(function(r){var o=document.createElement('option');o.value=r.nom;o.textContent=r.nom;maiF.appendChild(o);});
+    maiF.dataset.built='1';
+  }
+  var perRegF=document.getElementById('bdd-per-filter-reg');
+  if(perRegF&&!perRegF.dataset.built){
+    DB.regions.forEach(function(r){var o=document.createElement('option');o.value=r.nom;o.textContent=r.nom;perRegF.appendChild(o);});
+    perRegF.dataset.built='1';
+  }
+  var perMaiF=document.getElementById('bdd-per-filter-mai');
+  if(perMaiF&&!perMaiF.dataset.built){
+    DB.maisons.forEach(function(m){var o=document.createElement('option');o.value=m.nom;o.textContent=m.nom;perMaiF.appendChild(o);});
+    perMaiF.dataset.built='1';
+  }
+}
+
+// ═══════════════════════════════════════
+// BDD — PERSONNAGES
+// ═══════════════════════════════════════
+var editingPersoId=null;
+function openPersoModal(id){
+  editingPersoId=id||null;
+  var p=id?DB.persos.find(function(x){return x.id===id;}):null;
+  document.getElementById('modal-perso-title').textContent=p?'Modifier le personnage':'Nouveau personnage';
+  document.getElementById('mp-nom').value=p?p.nom:'';
+  document.getElementById('perso-alert').style.display='none';
+  var maiSel=document.getElementById('mp-maison');
+  maiSel.innerHTML='<option value="">-- Choisir --</option>';
+  DB.maisons.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.nom;if(p&&p.maisonId===m.id)o.selected=true;maiSel.appendChild(o);});
+  mpMaisonChange();
+  var sg=document.getElementById('mp-stats-grid');
+  sg.innerHTML='';
+  var max=DB.caracPerso.length*3;
+  document.getElementById('mp-total-max').textContent=max;
+  DB.caracPerso.forEach(function(c){
+    var v=p&&p.stats?p.stats[c]||1:1;
+    var inp=document.createElement('div');inp.className='mf';
+    inp.innerHTML='<label>'+h(c)+'</label><input type="number" min="1" max="5" value="'+v+'" data-carac="'+h(c)+'">';
+    inp.querySelector('input').oninput=mpUpdateTotal;
+    sg.appendChild(inp);
+  });
+  mpUpdateTotal();
+  var atoutsList=document.getElementById('mp-atouts-list');
+  atoutsList.innerHTML='';
+  var faibList=document.getElementById('mp-faib-list');
+  faibList.innerHTML='';
+  DB.af.filter(function(a){return a.type==='atout';}).forEach(function(a){
+    var checked=p&&p.atouts&&p.atouts.indexOf(a.id)!==-1;
+    var item=document.createElement('div');item.className='af-select-item';
+    item.innerHTML='<input type="checkbox" data-id="'+a.id+'" '+(checked?'checked':'')+' style="accent-color:var(--gl)"><span>'+h(a.nom)+'</span><span style="font-size:.72rem;color:var(--txt3);font-style:italic">'+h(a.desc)+'</span>';
+    atoutsList.appendChild(item);
+  });
+  DB.af.filter(function(a){return a.type==='faiblesse';}).forEach(function(a){
+    var checked=p&&p.faiblesses&&p.faiblesses.indexOf(a.id)!==-1;
+    var item=document.createElement('div');item.className='af-select-item';
+    item.innerHTML='<input type="checkbox" data-id="'+a.id+'" '+(checked?'checked':'')+' style="accent-color:var(--gl)"><span>'+h(a.nom)+'</span><span style="font-size:.72rem;color:var(--txt3);font-style:italic">'+h(a.desc)+'</span>';
+    faibList.appendChild(item);
+  });
+  document.getElementById('modal-perso').classList.add('open');
+}
+function mpMaisonChange(){
+  var maiId=+document.getElementById('mp-maison').value;
+  var m=DB.maisons.find(function(x){return x.id===maiId;});
+  document.getElementById('mp-region').value=m?m.region:'';
+}
+function mpUpdateTotal(){
+  var tot=0;
+  document.getElementById('mp-stats-grid').querySelectorAll('input').forEach(function(inp){tot+=clamp(+inp.value,1,5);});
+  document.getElementById('mp-total').textContent=tot;
+}
+function savePerso(){
+  var nom=document.getElementById('mp-nom').value.trim();
+  var alert=document.getElementById('perso-alert');
+  alert.style.display='none';
+  if(!nom){alert.textContent='Le nom est obligatoire.';alert.style.display='block';return;}
+  var maiId=+document.getElementById('mp-maison').value;
+  if(!maiId){alert.textContent='Sélectionnez une maison.';alert.style.display='block';return;}
+  var stats={};var tot=0;
+  document.getElementById('mp-stats-grid').querySelectorAll('input').forEach(function(inp){
+    var v=clamp(+inp.value,1,5);stats[inp.dataset.carac]=v;tot+=v;
+  });
+  var max=DB.caracPerso.length*3;
+  if(tot!==max){alert.textContent='Le total de points doit être exactement '+max+' (actuellement : '+tot+').';alert.style.display='block';return;}
+  var atouts=[];
+  document.getElementById('mp-atouts-list').querySelectorAll('input:checked').forEach(function(inp){atouts.push(+inp.dataset.id);});
+  if(atouts.length>3){alert.textContent='Maximum 3 atouts.';alert.style.display='block';return;}
+  var faiblesses=[];
+  document.getElementById('mp-faib-list').querySelectorAll('input:checked').forEach(function(inp){faiblesses.push(+inp.dataset.id);});
+  if(faiblesses.length>2){alert.textContent='Maximum 2 faiblesses.';alert.style.display='block';return;}
+  var m=DB.maisons.find(function(x){return x.id===maiId;});
+  var data={nom:nom,maisonId:maiId,maisonNom:m?m.nom:'',region:m?m.region:'',stats:stats,atouts:atouts,faiblesses:faiblesses};
+  if(editingPersoId){
+    var p=DB.persos.find(function(x){return x.id===editingPersoId;});
+    if(p)Object.assign(p,data);
+  }else{
+    data.id=Date.now();data.slots=[{},{}];DB.persos.push(data);
+  }
+  saveDB();closeModal('modal-perso');renderBddPersos();
+}
+function deletePerso(id){
+  if(!confirm('Supprimer ce personnage ?'))return;
+  DB.persos=DB.persos.filter(function(x){return x.id!==id;});
+  saveDB();renderBddPersos();
+}
+function renderBddPersos(){
+  var regF=(document.getElementById('bdd-per-filter-reg')||{}).value||'';
+  var maiF=(document.getElementById('bdd-per-filter-mai')||{}).value||'';
+  var list=DB.persos.filter(function(p){return(!regF||p.region===regF)&&(!maiF||p.maisonNom===maiF);});
+  var grid=document.getElementById('bdd-persos-grid');
+  if(!grid)return;
+  if(!list.length){grid.innerHTML='<div class="empty">Aucun personnage.</div>';return;}
+  grid.innerHTML=list.map(function(p){
+    var statBars=DB.caracPerso.map(function(c){
+      var v=p.stats?p.stats[c]||1:1;
+      var cls=statBarClass5(v);
+      return '<div class="stat-bar-row">'+
+        '<div class="stat-bar-lbl">'+h(c)+'</div>'+
+        '<div class="stat-bar-bg"><div class="stat-bar-fill '+cls.bar+'" style="width:'+Math.round(v/5*100)+'%"></div></div>'+
+        '<div class="stat-bar-val '+cls.val+'">'+v+'</div></div>';
+    }).join('');
+    var atoutTags=(p.atouts||[]).map(function(aid){var a=DB.af.find(function(x){return x.id===aid;});return a?'<span class="tag-atout">'+h(a.nom)+'</span>':'';}).join(' ');
+    var faibTags=(p.faiblesses||[]).map(function(fid){var f=DB.af.find(function(x){return x.id===fid;});return f?'<span class="tag-faib">'+h(f.nom)+'</span>':'';}).join(' ');
+    return '<div class="bdd-card">'+
+      '<div class="bdd-card-name">'+h(p.nom)+'</div>'+
+      '<div class="bdd-card-sub">'+h(p.maisonNom||'')+(p.region?' · '+h(p.region):'')+'</div>'+
+      '<div class="stat-bars">'+statBars+'</div>'+
+      (atoutTags||faibTags?'<div style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.3rem">'+atoutTags+faibTags+'</div>':'')+
+      buildSlotsHTML(p,'perso',p.id)+
+      '<div class="bdd-actions">'+
+        '<button class="edit-btn" onclick="openPersoModal('+p.id+')">Modifier</button>'+
+        '<button class="del-btn" onclick="deletePerso('+p.id+')">Supprimer</button>'+
+      '</div></div>';
+  }).join('');
+  attachSlotEvents('perso');
+}
+
+// ═══════════════════════════════════════
+// SLOTS D'ACTION
+// ═══════════════════════════════════════
+function buildSlotsHTML(obj,type,id){
+  if(!obj.slots)obj.slots=[{},{}];
+  return '<div class="action-slots">'+obj.slots.map(function(slot,si){
+    var active=slot.titre?'slot-active':'';
+    var done=slot.done?'slot-done':'';
+    return '<div class="action-slot '+active+' '+done+'" id="slot-'+type+'-'+id+'-'+si+'">'+
+      '<div class="slot-header">'+
+        '<input type="checkbox" class="slot-check" '+(slot.done?'checked':'')+' onchange="slotChange(\''+type+'\','+id+','+si+',\'done\',this.checked)">'+
+        '<span class="slot-label">Slot '+(si+1)+'</span>'+
+      '</div>'+
+      '<input type="text" class="slot-title-inp" placeholder="Titre de l\'action..." value="'+h(slot.titre||'')+'" oninput="slotChange(\''+type+'\','+id+','+si+',\'titre\',this.value)">'+
+      '<div class="slot-dates">'+
+        '<div><span class="slot-date-lbl">Début</span><input type="text" class="slot-date-inp" placeholder="--/--" value="'+h(slot.debut||'')+'" oninput="slotChange(\''+type+'\','+id+','+si+',\'debut\',this.value)"></div>'+
+        '<div><span class="slot-date-lbl">Fin</span><input type="text" class="slot-date-inp" placeholder="--/--" value="'+h(slot.fin||'')+'" oninput="slotChange(\''+type+'\','+id+','+si+',\'fin\',this.value)"></div>'+
+      '</div>'+
+      '<textarea class="slot-notes-inp" placeholder="Notes..." oninput="slotChange(\''+type+'\','+id+','+si+',\'notes\',this.value)">'+h(slot.notes||'')+'</textarea>'+
+      '</div>';
+  }).join('')+'</div>';
+}
+function slotChange(type,id,si,field,val){
+  var arr=type==='region'?DB.regions:type==='maison'?DB.maisons:DB.persos;
+  var obj=arr.find(function(x){return x.id===id;});
+  if(!obj)return;
+  if(!obj.slots)obj.slots=[{},{}];
+  obj.slots[si][field]=val;
+  saveDB();
+  // Update slot class without full re-render
+  var slotEl=document.getElementById('slot-'+type+'-'+id+'-'+si);
+  if(slotEl){
+    slotEl.classList.toggle('slot-active',!!(obj.slots[si].titre));
+    slotEl.classList.toggle('slot-done',!!(obj.slots[si].done));
+  }
+}
+function attachSlotEvents(type){}// Inline via HTML oninput/onchange
+
+// ═══════════════════════════════════════
+// PARAMÈTRES — CARAC. MAISON
+// ═══════════════════════════════════════
+function renderCaracMaison(){
+  var list=document.getElementById('carac-maison-list');
+  if(!list)return;
+  list.innerHTML=DB.caracMaison.map(function(c,i){
+    return '<div class="carac-edit-row">'+
+      '<input type="text" value="'+h(c)+'" data-idx="'+i+'" onchange="renameCaracMaison('+i+',this.value)">'+
+      '<button class="rm" onclick="deleteCaracMaison('+i+')" title="Supprimer">✕</button>'+
+      '</div>';
+  }).join('');
+}
+function addCaracMaison(){
+  DB.caracMaison.push('Nouvelle carac.');
+  DB.maisons.forEach(function(m){if(!m.stats)m.stats={};m.stats['Nouvelle carac.']=5;});
+  saveDB();renderCaracMaison();
+}
+function renameCaracMaison(idx,newName){
+  newName=newName.trim();
+  if(!newName)return;
+  var old=DB.caracMaison[idx];
+  DB.caracMaison[idx]=newName;
+  DB.maisons.forEach(function(m){
+    if(m.stats&&old in m.stats){m.stats[newName]=m.stats[old];delete m.stats[old];}
+  });
+  saveDB();
+}
+function deleteCaracMaison(idx){
+  if(!confirm('Supprimer cette caractéristique de toutes les maisons ?'))return;
+  var old=DB.caracMaison[idx];
+  DB.caracMaison.splice(idx,1);
+  DB.maisons.forEach(function(m){if(m.stats)delete m.stats[old];});
+  saveDB();renderCaracMaison();
+}
+
+// ═══════════════════════════════════════
+// PARAMÈTRES — CARAC. PERSO
+// ═══════════════════════════════════════
+function renderCaracPerso(){
+  var list=document.getElementById('carac-perso-list');
+  if(!list)return;
+  list.innerHTML=DB.caracPerso.map(function(c,i){
+    return '<div class="carac-edit-row">'+
+      '<input type="text" value="'+h(c)+'" data-idx="'+i+'" onchange="renameCaracPerso('+i+',this.value)">'+
+      '<button class="rm" onclick="deleteCaracPerso('+i+')" title="Supprimer">✕</button>'+
+      '</div>';
+  }).join('');
+  var disp=document.getElementById('perso-total-display');
+  if(disp)disp.textContent=DB.caracPerso.length*3;
+}
+function addCaracPerso(){
+  DB.caracPerso.push('Nouvelle carac.');
+  saveDB();renderCaracPerso();
+}
+function renameCaracPerso(idx,newName){
+  newName=newName.trim();if(!newName)return;
+  var old=DB.caracPerso[idx];DB.caracPerso[idx]=newName;
+  DB.persos.forEach(function(p){if(p.stats&&old in p.stats){p.stats[newName]=p.stats[old];delete p.stats[old];}});
+  saveDB();
+}
+function deleteCaracPerso(idx){
+  if(!confirm('Supprimer cette caractéristique de tous les personnages ?'))return;
+  var old=DB.caracPerso[idx];DB.caracPerso.splice(idx,1);
+  DB.persos.forEach(function(p){if(p.stats)delete p.stats[old];});
+  saveDB();renderCaracPerso();
+}
+
+// ═══════════════════════════════════════
+// PARAMÈTRES — ÉCHELLES
+// ═══════════════════════════════════════
+var MODS_M_FIXED={1:'+4',2:'+2',3:'+1',4:'+1',5:'0',6:'0',7:'−1',8:'−2',9:'−3',10:'−4'};
+var MODS_P_FIXED={1:'+3',2:'+1',3:'0',4:'−1',5:'−3'};
+function renderEchelles(){
+  var ec=document.getElementById('echelles-content');
+  if(!ec)return;
+  if(!DB.echelles.maison)DB.echelles.maison={};
+  if(!DB.echelles.perso)DB.echelles.perso={};
+  var html='<div class="scale-card"><h3>Échelle Maison (1-10)</h3>'+
+    '<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.5rem;margin-bottom:.5rem">'+
+    '<span class="fl" style="margin:0">Niv.</span><span class="fl" style="margin:0">Modif.</span><span class="fl" style="margin:0">Description</span></div>';
+  for(var i=1;i<=10;i++){
+    var desc=DB.echelles.maison[i]||'';
+    var modColor=i<=4?'color:var(--green2)':i<=6?'color:var(--txt3)':'color:var(--red2)';
+    html+='<div class="scale-row">'+
+      '<div class="scale-lvl">'+i+'</div>'+
+      '<div class="scale-mod" style="'+modColor+'">'+MODS_M_FIXED[i]+'</div>'+
+      '<input class="scale-desc-inp" type="text" value="'+h(desc)+'" placeholder="Description..." data-type="maison" data-lvl="'+i+'" onchange="saveEchelleDesc(\'maison\','+i+',this.value)">'+
+      '</div>';
+  }
+  html+='</div><div class="scale-card"><h3>Échelle Personnage (1-5)</h3>'+
+    '<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.5rem;margin-bottom:.5rem">'+
+    '<span class="fl" style="margin:0">Niv.</span><span class="fl" style="margin:0">Modif.</span><span class="fl" style="margin:0">Description</span></div>';
+  for(var j=1;j<=5;j++){
+    var desc2=DB.echelles.perso[j]||'';
+    var modColor2=j<=2?'color:var(--green2)':j===3?'color:var(--txt3)':'color:var(--red2)';
+    html+='<div class="scale-row">'+
+      '<div class="scale-lvl">'+j+'</div>'+
+      '<div class="scale-mod" style="'+modColor2+'">'+MODS_P_FIXED[j]+'</div>'+
+      '<input class="scale-desc-inp" type="text" value="'+h(desc2)+'" placeholder="Description..." data-type="perso" data-lvl="'+j+'" onchange="saveEchelleDesc(\'perso\','+j+',this.value)">'+
+      '</div>';
+  }
+  html+='</div>';
+  ec.innerHTML=html;
+}
+function saveEchelleDesc(type,lvl,val){
+  if(!DB.echelles[type])DB.echelles[type]={};
+  DB.echelles[type][lvl]=val;
+  saveDB();
+}
+
+// ═══════════════════════════════════════
+// PARAMÈTRES — ATOUTS & FAIBLESSES
+// ═══════════════════════════════════════
+function renderAFRef(){
+  var list=document.getElementById('af-ref-list');
+  if(!list)return;
+  list.innerHTML=DB.af.map(function(a){
+    return '<div class="af-ref-row">'+
+      '<input type="text" value="'+h(a.nom)+'" onchange="afUpdate('+a.id+',\'nom\',this.value)">'+
+      '<select onchange="afUpdate('+a.id+',\'type\',this.value)">'+
+        '<option value="atout" '+(a.type==='atout'?'selected':'')+'>Atout</option>'+
+        '<option value="faiblesse" '+(a.type==='faiblesse'?'selected':'')+'>Faiblesse</option>'+
+      '</select>'+
+      '<input type="text" value="'+h(a.desc)+'" onchange="afUpdate('+a.id+',\'desc\',this.value)" placeholder="Condition / description">'+
+      '<button class="rm" onclick="afDelete('+a.id+')">✕</button>'+
+      '</div>';
+  }).join('');
+}
+function afUpdate(id,field,val){
+  var a=DB.af.find(function(x){return x.id===id;});
+  if(a){a[field]=val;saveDB();}
+}
+function afDelete(id){
+  if(!confirm('Supprimer cet atout/faiblesse ?'))return;
+  DB.af=DB.af.filter(function(x){return x.id!==id;});
+  saveDB();renderAFRef();
+}
+function addAFRef(type){
+  DB.af.push({id:Date.now(),type:type,nom:'Nouveau '+(type==='atout'?'atout':'faiblesse'),desc:''});
+  saveDB();renderAFRef();
+}
+
+// ═══════════════════════════════════════
+// MODALES UTILITAIRES
+// ═══════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function moClickOut(e,id){if(e.target.id===id)closeModal(id);}
+
+// ═══════════════════════════════════════
+// ACTION PERSONNAGE
+// ═══════════════════════════════════════
+var apState={diff:null,persoId:null,caracSel:null,maisScore:null,afChecked:[],ctx:[]};
+function refreshActionPersoSelects(){
+  var sel=document.getElementById('ap-perso-sel');
+  if(!sel)return;
+  var cur=sel.value;sel.innerHTML='<option value="">-- Aucun --</option>';
+  DB.persos.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nom+(p.maisonNom?' ('+p.maisonNom+')':'');if(+cur===p.id)o.selected=true;sel.appendChild(o);});
+  apOnPersoChange();
+}
+function apSetDiff(val,btn){
+  apState.diff=val;
+  document.querySelectorAll('#actions-perso .diff-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('ap-forum-btn').disabled=false;
+  apRecalc();
+}
+function apOnPersoChange(){
+  var pid=+document.getElementById('ap-perso-sel').value;
+  apState.persoId=pid||null;
+  apState.caracSel=null;
+  apState.afChecked=[];
+  apBuildCaracGrid();
+  apBuildAFList();
+  apRecalc();
+}
+function apBuildCaracGrid(){
+  var grid=document.getElementById('ap-carac-grid');
+  if(!grid)return;
+  var p=apState.persoId?DB.persos.find(function(x){return x.id===apState.persoId;}):null;
+  grid.innerHTML='';
+  DB.caracPerso.forEach(function(c){
+    var v=p&&p.stats?p.stats[c]||1:1;
+    var mod=MOD_P[v]||0;
+    var modCls=mod<0?'cbmod-neg':mod>0?'cbmod-pos':'cbmod-zer';
+    var btn=document.createElement('button');
+    btn.className='carac-btn'+(apState.caracSel===c?' active':'');
+    btn.innerHTML='<span class="cbl">'+h(c)+'</span><span class="cbv">'+v+'</span><span class="cbmod '+modCls+'">'+(mod>0?'+':'')+mod+'</span>';
+    (function(carac){btn.onclick=function(){apState.caracSel=carac;apBuildCaracGrid();apRecalc();};})(c);
+    grid.appendChild(btn);
+  });
+  var perso=p;
+  var badge=document.getElementById('ap-perso-badge');
+  if(badge&&perso){
+    var v2=perso.stats&&apState.caracSel?perso.stats[apState.caracSel]||1:null;
+    badge.innerHTML=v2?modBadge(MOD_P[v2]||0):'';
+  }else if(badge){badge.innerHTML='';}
+}
+function apBuildAFList(){
+  var list=document.getElementById('ap-af-list');
+  if(!list)return;
+  var p=apState.persoId?DB.persos.find(function(x){return x.id===apState.persoId;}):null;
+  if(!p){list.innerHTML='<p style="font-size:.82rem;color:var(--txt3);font-style:italic">Sélectionnez un personnage.</p>';return;}
+  var afIds=[...(p.atouts||[]),...(p.faiblesses||[])];
+  if(!afIds.length){list.innerHTML='<p style="font-size:.82rem;color:var(--txt3);font-style:italic">Aucun atout/faiblesse assigné.</p>';return;}
+  list.innerHTML='<div class="af-check-list">'+afIds.map(function(aid){
+    var a=DB.af.find(function(x){return x.id===aid;});
+    if(!a)return'';
+    var checked=apState.afChecked.indexOf(aid)!==-1;
+    var tag=a.type==='atout'?'<span class="tag-atout">Atout −2</span>':'<span class="tag-faib">Faiblesse +2</span>';
+    return '<label class="af-check-item"><input type="checkbox" '+(checked?'checked':'')+' style="accent-color:var(--gl)" onchange="apToggleAF('+aid+',this.checked)">'+
+      '<span class="afn">'+h(a.nom)+'</span><span class="afd">'+h(a.desc)+'</span>'+tag+'</label>';
+  }).join('')+'</div>';
+}
+function apToggleAF(id,checked){
+  if(checked){if(apState.afChecked.indexOf(id)===-1)apState.afChecked.push(id);}
+  else{apState.afChecked=apState.afChecked.filter(function(x){return x!==id;});}
+  apRecalc();
+}
+function apAddCtx(){
+  var div=document.createElement('div');div.className='malus-row';
+  div.innerHTML='<input type="text" placeholder="Label..." oninput="apRecalc()"><input type="number" value="0" oninput="apRecalc()"><button class="rm" onclick="this.parentElement.remove();apRecalc()">✕</button>';
+  document.getElementById('ap-ctx-list').appendChild(div);
+  apRecalc();
+}
+function apRecalc(){
+  if(apState.diff===null)return;
+  var decomp=[];
+  var total=apState.diff;
+  decomp.push({label:'Difficulté de base',val:'+'+apState.diff,raw:apState.diff,type:'base'});
+  var msv=+document.getElementById('ap-maison-score').value;
+  if(msv){var mm=MOD_M[msv]||0;total+=mm;decomp.push({label:'Score de Maison ('+msv+')',val:(mm>0?'+':'')+mm,raw:mm,type:mm<0?'neg':mm>0?'pos':'zer'});}
+  var p=apState.persoId?DB.persos.find(function(x){return x.id===apState.persoId;}):null;
+  if(p&&apState.caracSel&&p.stats){
+    var cv=p.stats[apState.caracSel]||1;var cm=MOD_P[cv]||0;
+    total+=cm;decomp.push({label:apState.caracSel+' ('+cv+')',val:(cm>0?'+':'')+cm,raw:cm,type:cm<0?'neg':cm>0?'pos':'zer'});
+  }
+  apState.afChecked.forEach(function(aid){
+    var a=DB.af.find(function(x){return x.id===aid;});if(!a)return;
+    var delta=a.type==='atout'?-2:+2;total+=delta;
+    decomp.push({label:a.nom+' ('+(a.type==='atout'?'Atout':'Faiblesse')+')',val:(delta>0?'+':'')+delta,raw:delta,type:a.type==='atout'?'neg':'pos'});
+  });
+  document.getElementById('ap-ctx-list').querySelectorAll('.malus-row').forEach(function(row){
+    var lbl=row.querySelector('input[type=text]').value||'Mod.';
+    var val=+row.querySelector('input[type=number]').value||0;
+    total+=val;decomp.push({label:lbl,val:(val>0?'+':'')+val,raw:val,type:val<0?'neg':val>0?'pos':'zer'});
+  });
+  total=clamp(total,1,20);
+  var pct=Math.round((21-total)/20*100);pct=clamp(pct,0,100);
+  document.getElementById('ap-ra').textContent=document.getElementById('ap-name').value||'--';
+  document.getElementById('ap-sn').textContent=total;
+  var pnEl=document.getElementById('ap-pn');pnEl.textContent=pct+'%';
+  pnEl.className='pn '+probColor(pct);
+  var pb=document.getElementById('ap-pb');pb.style.width=pct+'%';pb.style.background=pbColor(pct);
+  var sw=document.getElementById('ap-ss-wrap');sw.style.display='block';
+  renderDecompBars('ap-sbars',decomp,total);renderDecompTable('ap-decomp',decomp,total);
+  var sticky=document.getElementById('ap-sticky');sticky.style.display='flex';
+  document.getElementById('ap-st-act').textContent=document.getElementById('ap-name').value||'Action';
+  var diffLabel=apState.diff===6?'Facile':apState.diff===10?'Moyenne':'Difficile';
+  document.getElementById('ap-st-diff').textContent='Difficulté : '+diffLabel;
+  document.getElementById('ap-st-sn').textContent=total;
+  var stPn=document.getElementById('ap-st-pn');stPn.textContent=pct+'%';stPn.className=probColor(pct);
+}
+function renderDecompBars(containerId,decomp,total){
+  var c=document.getElementById(containerId);if(!c)return;
+  c.innerHTML=decomp.map(function(d){
+    var pct=Math.abs(d.raw)/20*100;
+    var barCls=d.type==='neg'?'sbf-g':d.type==='pos'?'sbf-r':d.type==='base'?'sbf-a':'sbf-a';
+    var valCls=d.type==='neg'?'sbv-g':d.type==='pos'?'sbv-r':'sbv-a';
+    return '<div class="sbar-row"><div class="sbl">'+h(d.label.length>12?d.label.substring(0,12)+'…':d.label)+'</div>'+
+      '<div class="sbt"><div class="sbf '+barCls+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="sbv '+valCls+'">'+d.val+'</div></div>';
+  }).join('');
+}
+function renderDecompTable(containerId,decomp,total){
+  var c=document.getElementById(containerId);if(!c)return;
+  c.innerHTML=decomp.map(function(d){
+    var valCls=d.type==='neg'?'dvv-n':d.type==='pos'?'dvv-p':'dvv-z';
+    return '<div class="decomp-row"><span class="dvl">'+h(d.label)+'</span><span class="dvv '+valCls+'">'+d.val+'</span></div>';
+  }).join('')+
+  '<div class="decomp-row decomp-final"><span class="dvl" style="font-style:normal;font-weight:600;color:var(--parch2)">Seuil final (D20 ≥)</span><span class="dvv dvv-f">'+total+'</span></div>';
+}
+function apReset(){
+  apState={diff:null,persoId:null,caracSel:null,maisScore:null,afChecked:[],ctx:[]};
+  document.getElementById('ap-name').value='';
+  document.getElementById('ap-perso-sel').value='';
+  document.getElementById('ap-maison-score').value='';
+  document.querySelectorAll('#actions-perso .diff-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('ap-ctx-list').innerHTML='';
+  document.getElementById('ap-forum-btn').disabled=true;
+  document.getElementById('ap-ra').textContent='--';
+  document.getElementById('ap-sn').textContent='--';
+  document.getElementById('ap-pn').textContent='--';
+  document.getElementById('ap-pb').style.width='0%';
+  document.getElementById('ap-ss-wrap').style.display='none';
+  document.getElementById('ap-sticky').style.display='none';
+  apOnPersoChange();
+}
+
+// ═══════════════════════════════════════
+// ACTION MAISON
+// ═══════════════════════════════════════
+var amState={diff:null,maisonId:null,caracsSel:[],persoId:null,persoCarac:null,afChecked:[],ctx:[]};
+function refreshActionMaisonSelects(){
+  var sel=document.getElementById('am-maison-sel');
+  if(!sel)return;
+  var cur=sel.value;sel.innerHTML='<option value="">-- Choisir --</option>';
+  DB.maisons.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.nom;if(+cur===m.id)o.selected=true;sel.appendChild(o);});
+  var psel=document.getElementById('am-perso-sel');
+  if(!psel)return;
+  var pcur=psel.value;psel.innerHTML='<option value="">-- Aucun --</option>';
+  DB.persos.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nom;if(+pcur===p.id)o.selected=true;psel.appendChild(o);});
+  amOnMaisonChange();amOnPersoChange();
+}
+function amSetDiff(val,btn){
+  amState.diff=val;
+  document.querySelectorAll('#actions-maison .diff-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('am-forum-btn').disabled=false;
+  amRecalc();
+}
+function amOnMaisonChange(){
+  var mid=+document.getElementById('am-maison-sel').value;
+  amState.maisonId=mid||null;amState.caracsSel=[];
+  amBuildCaracGrid();amRecalc();
+  var badge=document.getElementById('am-maison-badge');
+  if(badge){
+    var m=mid?DB.maisons.find(function(x){return x.id===mid;}):null;
+    badge.innerHTML=m?'<span class="fb fb-'+h(m.faction)+'">'+h(m.faction)+'</span>':'';
+  }
+}
+function amBuildCaracGrid(){
+  var grid=document.getElementById('am-carac-grid');
+  if(!grid)return;
+  var m=amState.maisonId?DB.maisons.find(function(x){return x.id===amState.maisonId;}):null;
+  grid.innerHTML='';
+  DB.caracMaison.forEach(function(c){
+    var v=m&&m.stats?m.stats[c]||5:5;
+    var mod=MOD_M[v]||0;
+    var modCls=mod<0?'cbmod-neg':mod>0?'cbmod-pos':'cbmod-zer';
+    var active=amState.caracsSel.indexOf(c)!==-1;
+    var btn=document.createElement('button');
+    btn.className='carac-btn'+(active?' active':'');
+    btn.innerHTML='<span class="cbl">'+h(c)+'</span><span class="cbv">'+v+'</span><span class="cbmod '+modCls+'">'+(mod>0?'+':'')+mod+'</span>';
+    (function(carac){btn.onclick=function(){
+      var idx=amState.caracsSel.indexOf(carac);
+      if(idx!==-1)amState.caracsSel.splice(idx,1);else amState.caracsSel.push(carac);
+      amBuildCaracGrid();amRecalc();
+    };})(c);
+    grid.appendChild(btn);
+  });
+}
+function amOnPersoChange(){
+  var pid=+document.getElementById('am-perso-sel').value;
+  amState.persoId=pid||null;amState.persoCarac=null;amState.afChecked=[];
+  var csel=document.getElementById('am-perso-carac');
+  if(csel){csel.innerHTML='<option value="">-- Aucune --</option>';
+    if(pid){DB.caracPerso.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);});}
+  }
+  amBuildAFList();amRecalc();
+}
+function amBuildAFList(){
+  var list=document.getElementById('am-af-list');if(!list)return;
+  var p=amState.persoId?DB.persos.find(function(x){return x.id===amState.persoId;}):null;
+  if(!p){list.innerHTML='<p style="font-size:.82rem;color:var(--txt3);font-style:italic">Sélectionnez un personnage pilote.</p>';return;}
+  var afIds=[...(p.atouts||[]),...(p.faiblesses||[])];
+  if(!afIds.length){list.innerHTML='<p style="font-size:.82rem;color:var(--txt3);font-style:italic">Aucun atout/faiblesse assigné.</p>';return;}
+  list.innerHTML='<div class="af-check-list">'+afIds.map(function(aid){
+    var a=DB.af.find(function(x){return x.id===aid;});if(!a)return'';
+    var checked=amState.afChecked.indexOf(aid)!==-1;
+    var tag=a.type==='atout'?'<span class="tag-atout">Atout −2</span>':'<span class="tag-faib">Faiblesse +2</span>';
+    return '<label class="af-check-item"><input type="checkbox" '+(checked?'checked':'')+' style="accent-color:var(--gl)" onchange="amToggleAF('+aid+',this.checked)">'+
+      '<span class="afn">'+h(a.nom)+'</span><span class="afd">'+h(a.desc)+'</span>'+tag+'</label>';
+  }).join('')+'</div>';
+}
+function amToggleAF(id,checked){
+  if(checked){if(amState.afChecked.indexOf(id)===-1)amState.afChecked.push(id);}
+  else{amState.afChecked=amState.afChecked.filter(function(x){return x!==id;});}
+  amRecalc();
+}
+function amAddCtx(){
+  var div=document.createElement('div');div.className='malus-row';
+  div.innerHTML='<input type="text" placeholder="Label..." oninput="amRecalc()"><input type="number" value="0" oninput="amRecalc()"><button class="rm" onclick="this.parentElement.remove();amRecalc()">✕</button>';
+  document.getElementById('am-ctx-list').appendChild(div);amRecalc();
+}
+function amRecalc(){
+  if(amState.diff===null)return;
+  var decomp=[];var total=amState.diff;
+  decomp.push({label:'Difficulté de base',val:'+'+amState.diff,raw:amState.diff,type:'base'});
+  var m=amState.maisonId?DB.maisons.find(function(x){return x.id===amState.maisonId;}):null;
+  amState.caracsSel.forEach(function(c){
+    if(!m||!m.stats)return;
+    var v=m.stats[c]||5;var mod=MOD_M[v]||0;
+    total+=mod;decomp.push({label:c+' ('+v+')',val:(mod>0?'+':'')+mod,raw:mod,type:mod<0?'neg':mod>0?'pos':'zer'});
+  });
+  var p=amState.persoId?DB.persos.find(function(x){return x.id===amState.persoId;}):null;
+  var persoCaracSel=(document.getElementById('am-perso-carac')||{}).value;
+  if(p&&persoCaracSel&&p.stats){
+    var pv=p.stats[persoCaracSel]||1;var pm=MOD_P[pv]||0;
+    total+=pm;decomp.push({label:p.nom+' / '+persoCaracSel+' ('+pv+')',val:(pm>0?'+':'')+pm,raw:pm,type:pm<0?'neg':pm>0?'pos':'zer'});
+  }
+  amState.afChecked.forEach(function(aid){
+    var a=DB.af.find(function(x){return x.id===aid;});if(!a)return;
+    var delta=a.type==='atout'?-2:+2;total+=delta;
+    decomp.push({label:a.nom,val:(delta>0?'+':'')+delta,raw:delta,type:a.type==='atout'?'neg':'pos'});
+  });
+  document.getElementById('am-ctx-list').querySelectorAll('.malus-row').forEach(function(row){
+    var lbl=row.querySelector('input[type=text]').value||'Mod.';
+    var val=+row.querySelector('input[type=number]').value||0;
+    total+=val;decomp.push({label:lbl,val:(val>0?'+':'')+val,raw:val,type:val<0?'neg':val>0?'pos':'zer'});
+  });
+  total=clamp(total,1,20);
+  var pct=Math.round((21-total)/20*100);pct=clamp(pct,0,100);
+  document.getElementById('am-ra').textContent=document.getElementById('am-name').value||'--';
+  document.getElementById('am-sn').textContent=total;
+  var pnEl=document.getElementById('am-pn');pnEl.textContent=pct+'%';pnEl.className='pn '+probColor(pct);
+  var pb=document.getElementById('am-pb');pb.style.width=pct+'%';pb.style.background=pbColor(pct);
+  document.getElementById('am-ss-wrap').style.display='block';
+  renderDecompBars('am-sbars',decomp,total);renderDecompTable('am-decomp',decomp,total);
+  // store for forum
+  amState._decomp=decomp;amState._total=total;amState._pct=pct;
+}
+function amReset(){
+  amState={diff:null,maisonId:null,caracsSel:[],persoId:null,persoCarac:null,afChecked:[],ctx:[]};
+  document.getElementById('am-name').value='';
+  document.getElementById('am-maison-sel').value='';
+  document.getElementById('am-perso-sel').value='';
+  document.getElementById('am-perso-carac').innerHTML='<option value="">-- Aucune --</option>';
+  document.querySelectorAll('#actions-maison .diff-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('am-ctx-list').innerHTML='';
+  document.getElementById('am-forum-btn').disabled=true;
+  document.getElementById('am-ra').textContent='--';
+  document.getElementById('am-sn').textContent='--';
+  document.getElementById('am-pn').textContent='--';
+  document.getElementById('am-pb').style.width='0%';
+  document.getElementById('am-ss-wrap').style.display='none';
+  amBuildCaracGrid();amBuildAFList();
+}
+
+// ═══════════════════════════════════════
+// GÉNÉRATEUR DE CODE FORUM
+// ═══════════════════════════════════════
+var fmContext=null;
+var fmDecomp=[];var fmTotal=0;var fmPct=0;
+function openForumModal(type){
+  fmContext=type;
+  var name='',titre='',decomp=[],total=0,pct=0;
+  if(type==='perso'){
+    var p=apState.persoId?DB.persos.find(function(x){return x.id===apState.persoId;}):null;
+    name=p?p.nom:'';titre=document.getElementById('ap-name').value;
+    // Rebuild decomp from state
+    decomp=[];total=apState.diff||0;
+    if(apState.diff)decomp.push({label:'Difficulté de base',val:'+'+apState.diff,raw:apState.diff,type:'base'});
+    var msv=+document.getElementById('ap-maison-score').value;
+    if(msv){var mm=MOD_M[msv]||0;total+=mm;decomp.push({label:'Score de Maison ('+msv+')',val:(mm>0?'+':'')+mm,raw:mm,type:mm<0?'neg':mm>0?'pos':'zer'});}
+    if(p&&apState.caracSel&&p.stats){var cv=p.stats[apState.caracSel]||1;var cm=MOD_P[cv]||0;total+=cm;decomp.push({label:apState.caracSel+' ('+cv+')',val:(cm>0?'+':'')+cm,raw:cm,type:cm<0?'neg':cm>0?'pos':'zer'});}
+    apState.afChecked.forEach(function(aid){var a=DB.af.find(function(x){return x.id===aid;});if(!a)return;var d=a.type==='atout'?-2:+2;total+=d;decomp.push({label:a.nom,val:(d>0?'+':'')+d,raw:d,type:a.type==='atout'?'neg':'pos'});});
+    document.getElementById('ap-ctx-list').querySelectorAll('.malus-row').forEach(function(row){var lbl=row.querySelector('input[type=text]').value||'Mod.';var v=+row.querySelector('input[type=number]').value||0;total+=v;decomp.push({label:lbl,val:(v>0?'+':'')+v,raw:v,type:v<0?'neg':v>0?'pos':'zer'});});
+    total=clamp(total,1,20);pct=clamp(Math.round((21-total)/20*100),0,100);
+  }else{
+    var mai=amState.maisonId?DB.maisons.find(function(x){return x.id===amState.maisonId;}):null;
+    name=mai?mai.nom:'';titre=document.getElementById('am-name').value;
+    decomp=amState._decomp||[];total=amState._total||0;pct=amState._pct||0;
+  }
+  fmDecomp=decomp;fmTotal=total;fmPct=pct;
+  document.getElementById('fm-personnage').value=name;
+  document.getElementById('fm-titre').value=titre;
+  document.getElementById('fm-resume').value='';
+  // Build diff recap
+  var recap=document.getElementById('fm-diff-recap');
+  recap.innerHTML=decomp.map(function(d){
+    return '<span class="seuil-recap-item">'+h(d.label)+' <strong>'+d.val+'</strong></span>';
+  }).join('')+'<span class="seuil-tag">Seuil : '+total+'</span><span class="seuil-tag" style="color:'+(pct>=65?'var(--green2)':pct>=40?'var(--gl)':'var(--red2)')+'">'+pct+'% succès</span>';
+  // Default paliers
+  document.getElementById('fm-paliers-list').innerHTML='';
+  [['Succès critique','Résultat exceptionnel, effets dépassant les espérances'],
+   ['Succès','Objectif atteint dans les conditions prévues'],
+   ['Échec','Objectif non atteint, conséquences mineures'],
+   ['Échec critique','Échec cuisant, conséquences importantes']].forEach(function(p){
+    fmAddPalier(p[0],p[1]);
+  });
+  fmSwitchTab('preview');fmGenerate();
+  document.getElementById('forum-modal').classList.add('open');
+}
+function closeForumModal(){document.getElementById('forum-modal').classList.remove('open');}
+function fmoClickOut(e){if(e.target.id==='forum-modal')closeForumModal();}
+function fmAddPalier(lbl,effet){
+  var row=document.createElement('div');row.className='palier-row';
+  row.innerHTML='<input type="text" placeholder="Label (ex: Succès critique)" value="'+h(lbl||'')+'" oninput="fmGenerate()">'+
+    '<input type="text" placeholder="Effet..." value="'+h(effet||'')+'" oninput="fmGenerate()">'+
+    '<button class="rm" onclick="this.parentElement.remove();fmGenerate()">✕</button>';
+  document.getElementById('fm-paliers-list').appendChild(row);
+}
+function fmSwitchTab(t){
+  document.getElementById('fm-tab-preview').classList.toggle('active',t==='preview');
+  document.getElementById('fm-tab-code').classList.toggle('active',t==='code');
+  document.getElementById('fm-preview-panel').style.display=t==='preview'?'block':'none';
+  document.getElementById('fm-code-output').style.display=t==='code'?'block':'none';
+}
+function fmGenerate(){
+  var perso=document.getElementById('fm-personnage').value;
+  var titre=document.getElementById('fm-titre').value;
+  var resume=document.getElementById('fm-resume').value;
+  var paliers=[];
+  document.getElementById('fm-paliers-list').querySelectorAll('.palier-row').forEach(function(row){
+    var inputs=row.querySelectorAll('input[type=text]');
+    paliers.push({label:inputs[0].value,effet:inputs[1].value});
+  });
+  var diffLabel=fmTotal?'D20 ≥ '+fmTotal+' ('+fmPct+'% de succès)':'—';
+  // Build preview HTML
+  var successPaliers=paliers.filter(function(p){return p.label.toLowerCase().includes('succès');});
+  var echecPaliers=paliers.filter(function(p){return p.label.toLowerCase().includes('échec')||p.label.toLowerCase().includes('echec');});
+  var otherPaliers=paliers.filter(function(p){return!successPaliers.includes(p)&&!echecPaliers.includes(p);});
+  var paliersHtml=paliers.map(function(p){
+    var isSuccess=p.label.toLowerCase().includes('succès');
+    var isEchec=p.label.toLowerCase().includes('échec')||p.label.toLowerCase().includes('echec');
+    var col=isSuccess?'#6dca8a':isEchec?'#e07070':'#D4AF37';
+    return '<div style="margin-bottom:.6rem"><div class="fp-palier-label" style="color:'+col+'">'+h(p.label)+'</div><div class="fp-palier-effet">'+h(p.effet)+'</div></div>';
+  }).join('');
+  var preview='<div class="fp-form-tq"><div class="fp-form-title">Action Roleplaying</div>'+
+    '<div class="fp-form-subtitle">'+h(titre||'—')+'</div>'+
+    '<div class="fp-form-quote">'+h(perso||'—')+'</div></div>'+
+    '<div class="fp-form-body">'+
+    (resume?'<div class="fp-block"><div class="fp-h1"><span>📜</span>Résumé</div><div class="fp-line">'+h(resume)+'</div></div>':'')+
+    '<div class="fp-block"><div class="fp-h1"><span>⚙</span>Modificateurs</div>'+
+    fmDecomp.map(function(d){return '<div class="fp-line">'+h(d.label)+' : <strong style="color:var(--gl)">'+d.val+'</strong></div>';}).join('')+
+    '</div>'+
+    '<div class="fp-block"><div class="fp-seuil">Seuil final : D20 ≥ '+fmTotal+'</div><div class="fp-proba">'+fmPct+'% de chances de succès</div></div>'+
+    '<div class="fp-block"><div class="fp-h1"><span>🎲</span>Résultats</div>'+paliersHtml+'</div>'+
+    '<div class="fp-cred">Généré par COFAS — Outil MJ — Danse des Dragons</div>'+
+    '</div>';
+  document.getElementById('fm-preview-content').innerHTML=preview;
+  // Build BBCode
+  var bb='[fieldset=Action — '+escBB(titre||'—')+']\n';
+  bb+='[b][color=#D4AF37]Protagoniste :[/color][/b] '+escBB(perso||'—')+'\n\n';
+  if(resume)bb+='[b][color=#D4AF37]Résumé :[/color][/b]\n'+escBB(resume)+'\n\n';
+  bb+='[b][color=#D4AF37]Modificateurs :[/color][/b]\n';
+  fmDecomp.forEach(function(d){bb+='• '+escBB(d.label)+' : [b]'+d.val+'[/b]\n';});
+  bb+='\n[b][color=#D4AF37]Seuil final :[/color][/b] D20 ≥ [b]'+fmTotal+'[/b] ('+fmPct+'% de succès)\n\n';
+  bb+='[b][color=#D4AF37]Résultats possibles :[/color][/b]\n';
+  paliers.forEach(function(p){
+    var isSuccess=p.label.toLowerCase().includes('succès');
+    var isEchec=p.label.toLowerCase().includes('échec')||p.label.toLowerCase().includes('echec');
+    var col=isSuccess?'#6dca8a':isEchec?'#e07070':'#D4AF37';
+    bb+='[color='+col+'][b]'+escBB(p.label)+'[/b][/color] — '+escBB(p.effet)+'\n';
+  });
+  bb+='\n[size=1][color=#5a5040]Généré par COFAS — Outil MJ — Danse des Dragons[/color][/size]\n';
+  bb+='[/fieldset]';
+  document.getElementById('fm-code-output').textContent=bb;
+}
+function escBB(s){return String(s);}
+function fmCopy(){
+  var txt=document.getElementById('fm-code-output').textContent;
+  navigator.clipboard.writeText(txt).then(function(){
+    var btn=document.getElementById('fm-copy-btn');btn.textContent='✓ Copié !';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copier le code';btn.classList.remove('copied');},2000);
+  }).catch(function(){
+    var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    var btn=document.getElementById('fm-copy-btn');btn.textContent='✓ Copié !';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copier le code';btn.classList.remove('copied');},2000);
+  });
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+loadDB();
+renderBddRegions();
+refreshActionPersoSelects();
+refreshActionMaisonSelects();
+renderCaracMaison();
+renderCaracPerso();
+renderEchelles();
+renderAFRef();
+initCompRegions();
+</script>
+</body>
+</html>
