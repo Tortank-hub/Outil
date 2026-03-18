@@ -24,6 +24,10 @@ body{background:var(--stone);font-family:'Crimson Text',Georgia,serif;color:var(
 .site-header{text-align:center;padding:1.2rem 1rem .8rem;background:linear-gradient(180deg,rgba(28,26,23,1) 0%,rgba(37,33,24,.95) 100%);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:50;}
 .site-header h1{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gl);letter-spacing:.2em;text-transform:uppercase;text-shadow:0 0 30px rgba(212,175,55,.3);}
 .site-header p{font-size:.78rem;color:var(--txt3);font-style:italic;margin-top:.15rem;}
+.tour-encart{position:absolute;top:50%;right:1.1rem;transform:translateY(-50%);display:flex;align-items:center;gap:.5rem;}
+.tour-label{font-family:'Cinzel',serif;font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--txt3);}
+.tour-select{width:auto;min-width:58px;padding:.28rem .5rem;font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;color:var(--gl);background:rgba(184,151,58,.1);border:1px solid rgba(184,151,58,.4);border-radius:2px;text-align:center;cursor:pointer;}
+.tour-select:focus{border-color:var(--gl);}
 .dv{height:1px;background:linear-gradient(to right,transparent,var(--gold),var(--gl2),var(--gold),transparent);margin:.4rem auto;max-width:320px;box-shadow:0 0 8px rgba(212,175,55,.2);}
 .main-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:2px;background:rgba(28,26,23,.98);border-bottom:2px solid var(--bdr);padding:.3rem .5rem 0;position:sticky;top:var(--nav-h);z-index:49;}
 .main-tab{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;padding:.6rem 1.4rem;cursor:pointer;color:var(--txt3);background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
@@ -292,6 +296,11 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 <body>
 
 <div class="site-header">
+  <div class="tour-encart">
+    <span class="tour-label">Tour</span>
+    <select class="tour-select" id="tour-select" onchange="saveTour(this.value)">
+    </select>
+  </div>
   <div class="dv"></div>
   <h1>COFAS</h1>
   <p>Outil MJ — Interface Unifiée</p>
@@ -347,18 +356,9 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
         </div>
       </div>
       <div class="card"><div class="ct">Personnage</div>
-        <div class="g2" style="margin-bottom:.7rem">
-          <div><label class="fl">Sélectionner</label>
-            <select id="ap-perso-sel" onchange="apOnPersoChange()"><option value="">-- Aucun --</option></select>
-          </div>
-          <div><label class="fl">Score de Maison (1-10)</label>
-            <select id="ap-maison-score" onchange="apRecalc()">
-              <option value="">-- Aucune --</option>
-              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-              <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-            </select>
-            <div id="ap-maison-badge" style="margin-top:.3rem"></div>
-          </div>
+        <div style="margin-bottom:.7rem">
+          <label class="fl">Sélectionner</label>
+          <select id="ap-perso-sel" onchange="apOnPersoChange()"><option value="">-- Aucun --</option></select>
         </div>
         <label class="fl">Caractéristique utilisée</label>
         <div class="carac-grid" id="ap-carac-grid"></div>
@@ -653,15 +653,16 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
     <div class="mg">
       <div class="mf full"><label>Nom</label><input type="text" id="mr-nom" placeholder="Ex : Le Nord"></div>
       <div class="mf full"><label>Description</label><textarea id="mr-desc" placeholder="Description..."></textarea></div>
-      <div class="mf">
+      <div class="mf full">
         <label>Cohésion %</label>
-        <div style="display:flex;align-items:center;gap:.6rem">
-          <input type="range" id="mr-cohpct" min="0" max="100" value="50" oninput="document.getElementById('mr-cohpct-val').textContent=this.value+'%'" style="flex:1">
-          <span id="mr-cohpct-val" style="font-family:'Cinzel',serif;font-size:.82rem;color:var(--gl);min-width:36px">50%</span>
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.4rem">
+          <input type="range" id="mr-cohpct" min="0" max="100" value="50" oninput="mrCohUpdate(this.value)" style="flex:1">
+          <span id="mr-cohpct-val" style="font-family:'Cinzel',serif;font-size:.88rem;font-weight:700;color:var(--gl);min-width:36px">50%</span>
         </div>
-      </div>
-      <div class="mf"><label>Statut Cohésion</label>
-        <select id="mr-cohstat"><option>Fragmentée</option><option>Tendue</option><option selected>Stable</option><option>Soudée</option><option>Unie</option></select>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <span style="font-family:'Cinzel',serif;font-size:.62rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em">Statut :</span>
+          <span id="mr-cohstat-badge" style="font-family:'Cinzel',serif;font-size:.78rem;font-weight:700;padding:.18rem .6rem;border-radius:2px;background:rgba(184,151,58,.12);border:1px solid var(--bdr);color:var(--gl)">Stable</span>
+        </div>
       </div>
       <div class="mf"><label>Forces Terrestres</label><input type="text" id="mr-terres" placeholder="Ex : 45 000 – 60 000 h."></div>
       <div class="mf"><label>Forces Navales</label><input type="text" id="mr-navales" placeholder="Ex : 75 – 126 nav."></div>
@@ -769,6 +770,59 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 </div>
 
 <script>
+
+// ═══════════════════════════════════════
+// COHÉSION RÉGIONALE
+// ═══════════════════════════════════════
+var COH_PALIERS_DEFAULT=[
+  {label:'Divisée',min:0,max:25,color:'var(--red2)'},
+  {label:'Tendue',min:25,max:40,color:'var(--orange)'},
+  {label:'Stable',min:40,max:60,color:'var(--gl)'},
+  {label:'Soudée',min:60,max:75,color:'var(--green2)'},
+  {label:'Unie',min:75,max:100,color:'#a0ffb8'}
+];
+function getCohPaliers(){
+  if(DB.echelles&&DB.echelles.cohesion&&DB.echelles.cohesion.paliers){
+    return DB.echelles.cohesion.paliers;
+  }
+  return COH_PALIERS_DEFAULT;
+}
+function getCohesionLabel(pct){
+  var paliers=getCohPaliers();
+  pct=+pct;
+  for(var i=0;i<paliers.length;i++){
+    var p=paliers[i];
+    // Dernier palier: max inclusif
+    if(i===paliers.length-1){if(pct>=p.min&&pct<=p.max)return p.label;}
+    else{if(pct>=p.min&&pct<p.max)return p.label;}
+  }
+  return paliers[paliers.length-1].label;
+}
+function getCohesionColor(pct){
+  var paliers=getCohPaliers();
+  pct=+pct;
+  for(var i=0;i<paliers.length;i++){
+    var p=paliers[i];
+    if(i===paliers.length-1){if(pct>=p.min&&pct<=p.max)return p.color;}
+    else{if(pct>=p.min&&pct<p.max)return p.color;}
+  }
+  return paliers[paliers.length-1].color;
+}
+function mrCohUpdate(val){
+  val=+val;
+  document.getElementById('mr-cohpct-val').textContent=val+'%';
+  var label=getCohesionLabel(val);
+  var color=getCohesionColor(val);
+  var badge=document.getElementById('mr-cohstat-badge');
+  if(badge){badge.textContent=label;badge.style.color=color;
+    badge.style.borderColor=color;
+    badge.style.background=color==='var(--red2)'?'rgba(139,26,26,.12)':
+      color==='var(--orange)'?'rgba(200,140,30,.12)':
+      color==='var(--gl)'?'rgba(184,151,58,.12)':
+      color==='var(--green2)'?'rgba(45,122,62,.12)':
+      'rgba(50,180,80,.12)';
+  }
+}
 // ═══════════════════════════════════════
 // DONNÉES & PERSISTANCE
 // ═══════════════════════════════════════
@@ -795,8 +849,25 @@ function loadDB(){
   if(!DB.persos)DB.persos=[];
   if(!DB.regions)DB.regions=[];
   if(!DB.maisons)DB.maisons=[];
+  initTourSelect();
 }
 function saveDB(){localStorage.setItem('cofas_v3',JSON.stringify(DB));}
+// ═══════════════════════════════════════
+// TOUR DE JEU
+// ═══════════════════════════════════════
+function initTourSelect(){
+  var sel=document.getElementById('tour-select');
+  if(!sel)return;
+  sel.innerHTML='';
+  for(var t=1;t<=30;t++){var o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o);}
+  var saved=DB.tour||1;
+  sel.value=saved;
+}
+function saveTour(val){
+  DB.tour=+val;
+  saveDB();
+}
+
 
 function initDefault(){
   DB.regions=[
@@ -914,8 +985,10 @@ function statBarClass5(v){
 }
 function probColor(pct){if(pct>=65)return'ph';if(pct>=40)return'pm';return'pl';}
 function pbColor(pct){
-  if(pct>=65)return'linear-gradient(to right,#2d7a3e,#6dca8a)';
-  if(pct>=40)return'linear-gradient(to right,#9a7b2e,#D4AF37)';
+  var c=getCohesionColor(pct);
+  if(c==='var(--green2)'||c==='#a0ffb8')return'linear-gradient(to right,#2d7a3e,#6dca8a)';
+  if(c==='var(--gl)')return'linear-gradient(to right,#9a7b2e,#D4AF37)';
+  if(c==='var(--orange)')return'linear-gradient(to right,#b07820,#e0a030)';
   return'linear-gradient(to right,#8b1a1a,#e07070)';
 }
 function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
@@ -1060,7 +1133,7 @@ function initCompRegions(){
       '<div style="font-size:.68rem;color:var(--txt3);margin-bottom:.3rem">'+h(r.statCohesion||'')+'</div>'+
       '<div style="font-size:.65rem;color:var(--txt3)">Moy. stats : <strong style="color:var(--gl)">'+avg+'</strong></div>'+
       '<div class="mini-bar-bg" style="margin-top:.3rem"><div class="mini-bar-fill" style="width:'+Math.round(avg/10*100)+'%;background:var(--gl)"></div></div>'+
-      '<div style="font-size:.6rem;color:var(--txt3);margin-top:.2rem">Cohésion : <strong style="color:'+(cohPct>=65?'var(--green2)':cohPct>=45?'var(--orange)':'var(--red2)')+'">'+cohPct+'%</strong></div>';
+      '<div style="font-size:.6rem;color:var(--txt3);margin-top:.2rem">Cohésion : <strong style="color:'+(getCohesionColor(cohPct))+'">'+cohPct+'%</strong></div>';
     (function(rid){card.onclick=function(){
       var idx=crSelected.indexOf(rid);
       if(idx!==-1){crSelected.splice(idx,1);}
@@ -1405,8 +1478,7 @@ function openRegionModal(id){
   document.getElementById('mr-desc').value=r?r.desc:'';
   var pct=r?r.cohesionPct:50;
   document.getElementById('mr-cohpct').value=pct;
-  document.getElementById('mr-cohpct-val').textContent=pct+'%';
-  document.getElementById('mr-cohstat').value=r?r.statCohesion:'Stable';
+  mrCohUpdate(pct);
   document.getElementById('mr-terres').value=r?r.forcesTerrestres:'';
   document.getElementById('mr-navales').value=r?r.forcesNavales:'';
   document.getElementById('modal-region').classList.add('open');
@@ -1414,9 +1486,10 @@ function openRegionModal(id){
 function saveRegion(){
   var nom=document.getElementById('mr-nom').value.trim();
   if(!nom)return;
+  var cohPct=+document.getElementById('mr-cohpct').value;
   var data={nom:nom,desc:document.getElementById('mr-desc').value,
-    cohesionPct:+document.getElementById('mr-cohpct').value,
-    statCohesion:document.getElementById('mr-cohstat').value,
+    cohesionPct:cohPct,
+    statCohesion:getCohesionLabel(cohPct),
     forcesTerrestres:document.getElementById('mr-terres').value,
     forcesNavales:document.getElementById('mr-navales').value};
   if(editingRegionId){
@@ -1439,21 +1512,82 @@ function renderBddRegions(){
   if(!DB.regions.length){grid.innerHTML='<div class="empty">Aucune région.</div>';return;}
   grid.innerHTML=DB.regions.map(function(r){
     var coh=r.cohesionPct||0;
-    var cohColor=coh>=65?'var(--green2)':coh>=45?'var(--orange)':'var(--red2)';
+    var cohColor=getCohesionColor(coh);
+
+    // ── Scores région via échelles (même logique que Comparatif > Régions > Classement)
+    var statBars='';
+    var rSumStats=regionSumStats(r.nom);
+    if(rSumStats){
+      var nbMaisons=DB.maisons.filter(function(m){return m.region===r.nom;}).length;
+      var rows=DB.caracMaison.map(function(c){
+        var valObj=rSumStats[c];
+        var sd=SCALES_DATA[c];
+        var unit=sd?sd.unit:'';
+        // Valeur affichée : fourchette ou pts
+        var dispTxt;
+        if(valObj&&valObj.type==='quantitative'){
+          dispTxt=fmtScaleVal(valObj.min,unit)+' – '+fmtScaleVal(valObj.max,unit);
+        } else if(valObj&&valObj.type==='score'){
+          dispTxt=valObj.weight+' pts';
+        } else { dispTxt='—'; }
+        // Barre : sort relatif au max théorique
+        var sortVal=valObj?valObj.sort:0;
+        var maxTheo=nbMaisons*(REGION_WEIGHTS[9]||55);
+        var pct=maxTheo>0?Math.min(100,Math.round(sortVal/maxTheo*100)):0;
+        var isQuant=sd&&sd.type==='quantitative';
+        var barCls=isQuant?'sbf-4':'sbf-3';
+        return '<div class="stat-bar-row">'+
+          '<div class="stat-bar-lbl">'+h(c)+'</div>'+
+          '<div class="stat-bar-bg"><div class="stat-bar-fill '+barCls+'" style="width:'+pct+'%"></div></div>'+
+          '<div class="stat-bar-val" style="font-size:.55rem;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;color:var(--txt2)">'+dispTxt+'</div>'+
+          '</div>';
+      }).join('');
+      statBars='<div class="stat-bars" style="margin-top:.6rem;padding-top:.5rem;border-top:1px solid var(--bdr2)">'+
+        '<div style="font-family:\'Cinzel\',serif;font-size:.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3);margin-bottom:.35rem">Scores région ('+nbMaisons+' maison'+(nbMaisons>1?'s':'')+')</div>'+
+        rows+'</div>';
+    }
+
+    // ── 3 slots action
+    if(!r.slots||r.slots.length<3){
+      while(!r.slots||r.slots.length<3)(r.slots=r.slots||[]).push({});
+    }
+    var slotsHTML='<div class="action-slots" style="grid-template-columns:1fr;gap:.45rem;margin-top:.6rem">'+
+      r.slots.slice(0,3).map(function(slot,si){
+        var active=slot.titre?'slot-active':'';
+        var done=slot.done?'slot-done':'';
+        return '<div class="action-slot '+active+' '+done+'" id="slot-region-'+r.id+'-'+si+'">'+
+          '<div class="slot-header">'+
+            '<input type="checkbox" class="slot-check" '+(slot.done?'checked':'')+' onchange="slotChange(\'region\','+r.id+','+si+',\'done\',this.checked)">'+
+            '<span class="slot-label">Slot '+(si+1)+'</span>'+
+          '</div>'+
+          '<input type="text" class="slot-title-inp" placeholder="Titre de l\'action..." value="'+h(slot.titre||'')+'" oninput="slotChange(\'region\','+r.id+','+si+',\'titre\',this.value)">'+
+          '<div class="slot-dates">'+
+            '<div><span class="slot-date-lbl">Début</span><input type="text" class="slot-date-inp" placeholder="--/--" value="'+h(slot.debut||'')+'" oninput="slotChange(\'region\','+r.id+','+si+',\'debut\',this.value)"></div>'+
+            '<div><span class="slot-date-lbl">Fin</span><input type="text" class="slot-date-inp" placeholder="--/--" value="'+h(slot.fin||'')+'" oninput="slotChange(\'region\','+r.id+','+si+',\'fin\',this.value)"></div>'+
+          '</div>'+
+          '<textarea class="slot-notes-inp" placeholder="Notes..." oninput="slotChange(\'region\','+r.id+','+si+',\'notes\',this.value)">'+h(slot.notes||'')+'</textarea>'+
+          '</div>';
+      }).join('')+'</div>';
+
     return '<div class="bdd-card">'+
       '<div class="bdd-card-name">'+h(r.nom)+'</div>'+
-      '<div class="bdd-card-sub">'+h(r.statCohesion||'')+'</div>'+
-      '<div style="margin:.5rem 0"><div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:.2rem"><span style="color:var(--txt3)">Cohésion</span><span style="color:'+cohColor+';font-family:\'Cinzel\',serif;font-weight:700">'+coh+'%</span></div>'+
-      '<div class="pb-wrap"><div class="pb" style="width:'+coh+'%;background:'+pbColor(coh)+'"></div></div></div>'+
+      '<div class="bdd-card-sub" style="color:'+getCohesionColor(coh)+'">'+getCohesionLabel(coh)+'</div>'+
+      '<div style="margin:.5rem 0">'+
+        '<div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:.2rem">'+
+          '<span style="color:var(--txt3)">Cohésion</span>'+
+          '<span style="color:'+cohColor+';font-family:\'Cinzel\',serif;font-weight:700">'+coh+'%</span>'+
+        '</div>'+
+        '<div class="pb-wrap"><div class="pb" style="width:'+coh+'%;background:'+pbColor(coh)+'"></div></div>'+
+      '</div>'+
       '<div style="font-size:.78rem;color:var(--txt3);margin:.3rem 0"><span style="color:var(--parch3)">🗡 </span>'+h(r.forcesTerrestres||'—')+'</div>'+
       '<div style="font-size:.78rem;color:var(--txt3);margin:.2rem 0"><span style="color:var(--parch3)">⚓ </span>'+h(r.forcesNavales||'—')+'</div>'+
-      buildSlotsHTML(r,'region',r.id)+
+      statBars+
+      slotsHTML+
       '<div class="bdd-actions">'+
         '<button class="edit-btn" onclick="openRegionModal('+r.id+')">Modifier</button>'+
         '<button class="del-btn" onclick="deleteRegion('+r.id+')">Supprimer</button>'+
       '</div></div>';
   }).join('');
-  attachSlotEvents('region');
 }
 
 // ═══════════════════════════════════════
@@ -1833,6 +1967,41 @@ function renderEchelles(){
 
   var html='';
 
+  // ── Bloc Cohésion Régionale ──
+  if(!DB.echelles.cohesion)DB.echelles.cohesion={};
+  if(!DB.echelles.cohesion.paliers)DB.echelles.cohesion.paliers=JSON.parse(JSON.stringify(COH_PALIERS_DEFAULT));
+  var paliers=DB.echelles.cohesion.paliers;
+  html+='<div class="scale-card" style="margin-bottom:1.5rem;border-top-color:var(--gold)">';
+  html+='<h3 style="display:flex;align-items:center;gap:.5rem"><span style="font-size:.9rem">🏛</span> Échelle de Cohésion Régionale</h3>';
+  html+='<p style="font-size:.78rem;color:var(--txt3);font-style:italic;margin-bottom:.9rem">Définit le statut affiché automatiquement dans les fiches régions selon le curseur de cohésion.</p>';
+  html+='<div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr auto;gap:.4rem;align-items:center;margin-bottom:.4rem;padding-bottom:.3rem;border-bottom:1px solid var(--bdr2)">';
+  html+='<span class="fl" style="margin:0;font-size:.58rem">Statut</span>';
+  html+='<span class="fl" style="margin:0;font-size:.58rem">Couleur</span>';
+  html+='<span class="fl" style="margin:0;font-size:.58rem">Seuil min (%)</span>';
+  html+='<span class="fl" style="margin:0;font-size:.58rem">Seuil max (%)</span>';
+  html+='<span></span>';
+  html+='</div>';
+  for(var ci=0;ci<paliers.length;ci++){
+    var p=paliers[ci];
+    var col=p.color||'var(--gl)';
+    var rowBgC=ci%2===0?'rgba(0,0,0,.12)':'transparent';
+    html+='<div style="display:grid;grid-template-columns:80px 1fr 1fr 1fr auto;gap:.4rem;align-items:center;padding:.3rem .2rem;border-radius:2px;background:'+rowBgC+'">';
+    // Label
+    html+='<input type="text" value="'+h(p.label)+'" style="padding:.2rem .4rem;font-size:.82rem;font-family:\'Cinzel\',serif;font-weight:600;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.25);border-radius:2px;color:'+col+'" onchange="saveCohPalier('+ci+',\'label\',this.value)">';
+    // Couleur preview
+    html+='<div style="display:flex;align-items:center;gap:.35rem"><div style="width:18px;height:18px;border-radius:3px;background:'+col+';border:1px solid rgba(255,255,255,.15);flex-shrink:0"></div><span style="font-size:.7rem;color:var(--txt3)">'+col+'</span></div>';
+    // Min
+    html+='<input type="number" value="'+p.min+'" min="0" max="100" style="padding:.2rem .4rem;font-size:.8rem;font-family:\'Cinzel\',serif;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.25);border-radius:2px;color:var(--txt2);text-align:center" onchange="saveCohPalier('+ci+',\'min\',+this.value)">';
+    // Max
+    html+='<input type="number" value="'+p.max+'" min="0" max="100" style="padding:.2rem .4rem;font-size:.8rem;font-family:\'Cinzel\',serif;background:rgba(0,0,0,.2);border:1px solid rgba(184,151,58,.25);border-radius:2px;color:var(--txt2);text-align:center" onchange="saveCohPalier('+ci+',\'max\',+this.value)">';
+    // Apercu
+    html+='<span style="font-family:\'Cinzel\',serif;font-size:.65rem;color:'+col+';white-space:nowrap;padding:.1rem .3rem;border:1px solid currentColor;border-radius:2px">'+h(p.min)+'–'+h(p.max)+'%</span>';
+    html+='</div>';
+  }
+  // Reset button
+  html+='<button onclick="resetCohPaliers()" style="margin-top:.7rem;background:none;border:1px dashed rgba(184,151,58,.3);border-radius:2px;padding:.28rem .8rem;font-family:\'Cinzel\',serif;font-size:.62rem;color:var(--txt3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor=\'var(--gold)\';this.style.color=\'var(--parch2)\'" onmouseout="this.style.borderColor=\'rgba(184,151,58,.3)\';this.style.color=\'var(--txt3)\'">↺ Réinitialiser les valeurs par défaut</button>';
+  html+='</div>';
+
   // ── Bloc D20 modificateurs Maison ──
   html+='<div class="scale-card" style="margin-bottom:1rem"><h3>Modificateurs D20 — Caractéristiques Maison (1-10)</h3>'+
     '<p style="font-size:.78rem;color:var(--txt3);font-style:italic;margin-bottom:.7rem">Ces modificateurs s\'appliquent au seuil de difficulté lors des jets de dés.</p>'+
@@ -1954,6 +2123,18 @@ function renderEchelles(){
   html+='</div>';
 
   ec.innerHTML=html;
+}
+function saveCohPalier(idx,field,val){
+  if(!DB.echelles.cohesion)DB.echelles.cohesion={};
+  if(!DB.echelles.cohesion.paliers)DB.echelles.cohesion.paliers=JSON.parse(JSON.stringify(COH_PALIERS_DEFAULT));
+  DB.echelles.cohesion.paliers[idx][field]=val;
+  saveDB();
+}
+function resetCohPaliers(){
+  if(!confirm('Remettre les seuils de cohésion par défaut ?'))return;
+  if(!DB.echelles.cohesion)DB.echelles.cohesion={};
+  DB.echelles.cohesion.paliers=JSON.parse(JSON.stringify(COH_PALIERS_DEFAULT));
+  saveDB();renderEchelles();
 }
 function saveEchelleDesc(type,lvl,val){
   if(!DB.echelles[type])DB.echelles[type]={};
@@ -2102,8 +2283,7 @@ function apRecalc(){
   var decomp=[];
   var total=apState.diff;
   decomp.push({label:'Difficulté de base',val:'+'+apState.diff,raw:apState.diff,type:'base'});
-  var msv=+document.getElementById('ap-maison-score').value;
-  if(msv){var mm=MOD_M[msv]||0;total+=mm;decomp.push({label:'Score de Maison ('+msv+')',val:(mm>0?'+':'')+mm,raw:mm,type:mm<0?'neg':mm>0?'pos':'zer'});}
+  var msv=0;
   var p=apState.persoId?DB.persos.find(function(x){return x.id===apState.persoId;}):null;
   if(p&&apState.caracSel&&p.stats){
     var cv=p.stats[apState.caracSel]||1;var cm=MOD_P[cv]||0;
@@ -2158,7 +2338,7 @@ function apReset(){
   apState={diff:null,persoId:null,caracSel:null,maisScore:null,afChecked:[],ctx:[]};
   document.getElementById('ap-name').value='';
   document.getElementById('ap-perso-sel').value='';
-  document.getElementById('ap-maison-score').value='';
+  
   document.querySelectorAll('#actions-perso .diff-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('ap-ctx-list').innerHTML='';
   document.getElementById('ap-forum-btn').disabled=true;
@@ -2325,8 +2505,7 @@ function openForumModal(type){
     // Rebuild decomp from state
     decomp=[];total=apState.diff||0;
     if(apState.diff)decomp.push({label:'Difficulté de base',val:'+'+apState.diff,raw:apState.diff,type:'base'});
-    var msv=+document.getElementById('ap-maison-score').value;
-    if(msv){var mm=MOD_M[msv]||0;total+=mm;decomp.push({label:'Score de Maison ('+msv+')',val:(mm>0?'+':'')+mm,raw:mm,type:mm<0?'neg':mm>0?'pos':'zer'});}
+    var msv=0;
     if(p&&apState.caracSel&&p.stats){var cv=p.stats[apState.caracSel]||1;var cm=MOD_P[cv]||0;total+=cm;decomp.push({label:apState.caracSel+' ('+cv+')',val:(cm>0?'+':'')+cm,raw:cm,type:cm<0?'neg':cm>0?'pos':'zer'});}
     apState.afChecked.forEach(function(aid){var a=DB.af.find(function(x){return x.id===aid;});if(!a)return;var d=a.type==='atout'?-2:+2;total+=d;decomp.push({label:a.nom,val:(d>0?'+':'')+d,raw:d,type:a.type==='atout'?'neg':'pos'});});
     document.getElementById('ap-ctx-list').querySelectorAll('.malus-row').forEach(function(row){var lbl=row.querySelector('input[type=text]').value||'Mod.';var v=+row.querySelector('input[type=number]').value||0;total+=v;decomp.push({label:lbl,val:(v>0?'+':'')+v,raw:v,type:v<0?'neg':v>0?'pos':'zer'});});
@@ -2495,6 +2674,7 @@ renderCaracPerso();
 renderEchelles();
 renderAFRef();
 initCompRegions();
+initTourSelect();
 </script>
 </body>
 </html>
