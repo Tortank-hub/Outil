@@ -296,6 +296,12 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
   <h1>COFAS</h1>
   <p>Outil MJ — Interface Unifiée</p>
   <div class="dv"></div>
+  <div style="margin-top:.5rem">
+    <button onclick="exportHTML()" style="background:rgba(184,151,58,.18);border:1px solid var(--gold);border-radius:2px;padding:.38rem 1rem;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gl);cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(184,151,58,.35)'" onmouseout="this.style.background='rgba(184,151,58,.18)'">
+      ⬇ Exporter le fichier HTML
+    </button>
+    <span id="export-badge" style="display:none;margin-left:.6rem;font-size:.72rem;color:var(--green2);font-style:italic">✓ Téléchargé !</span>
+  </div>
 </div>
 
 <nav class="main-nav">
@@ -602,7 +608,7 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
   <div class="sub-page" id="params-carac-perso">
     <div class="page-wrap">
       <div class="card"><div class="ct">Caractéristiques de Personnage</div>
-        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:.8rem;font-style:italic">Total de points imposé : <strong id="perso-total-display" style="color:var(--gl)">18</strong> pts (nb. de carac × 3).</p>
+        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:.8rem;font-style:italic">La somme totale des stats est définie librement à la création de chaque personnage.</p>
         <div id="carac-perso-list"></div>
         <button class="ab" onclick="addCaracPerso()">+ Ajouter une caractéristique de personnage</button>
       </div>
@@ -613,16 +619,27 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
   </div>
   <div class="sub-page" id="params-af">
     <div class="page-wrap">
-      <div class="card"><div class="ct">Liste de référence</div>
-        <p style="font-size:.82rem;color:var(--txt2);margin-bottom:.8rem;font-style:italic">Atout = −2 au seuil. Faiblesse = +2 au seuil.</p>
-        <div style="display:grid;grid-template-columns:1fr 90px 1fr auto;gap:.5rem;margin-bottom:.4rem">
-          <span class="fl" style="margin:0">Nom</span><span class="fl" style="margin:0">Type</span>
-          <span class="fl" style="margin:0">Description</span><span></span>
+      <p style="font-size:.82rem;color:var(--txt2);margin-bottom:1rem;font-style:italic">Atout = −2 au seuil final. Faiblesse = +2 au seuil final.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="card">
+          <div class="ct" style="color:var(--green2)">⚜ Atouts</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;margin-bottom:.4rem">
+            <span class="fl" style="margin:0">Nom</span>
+            <span class="fl" style="margin:0">Description</span>
+            <span></span>
+          </div>
+          <div id="af-atouts-list"></div>
+          <button class="ab" onclick="addAFRef('atout')" style="margin-top:.5rem">+ Ajouter un atout</button>
         </div>
-        <div id="af-ref-list"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem">
-          <button class="ab" onclick="addAFRef('atout')">+ Ajouter un atout</button>
-          <button class="ab" onclick="addAFRef('faiblesse')">+ Ajouter une faiblesse</button>
+        <div class="card">
+          <div class="ct" style="color:var(--red2)">⚠ Faiblesses</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;margin-bottom:.4rem">
+            <span class="fl" style="margin:0">Nom</span>
+            <span class="fl" style="margin:0">Description</span>
+            <span></span>
+          </div>
+          <div id="af-faib-list"></div>
+          <button class="ab" onclick="addAFRef('faiblesse')" style="margin-top:.5rem">+ Ajouter une faiblesse</button>
         </div>
       </div>
     </div>
@@ -691,7 +708,14 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
       <div class="mf"><label>Maison</label><select id="mp-maison" onchange="mpMaisonChange()"></select></div>
       <div class="mf"><label>Région</label><input type="text" id="mp-region" readonly style="opacity:.7"></div>
     </div>
-    <div class="mst">Caractéristiques — Total : <span id="mp-total" style="color:var(--gl)">0</span> / <span id="mp-total-max">18</span></div>
+    <div class="mst" style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap">
+      <span>Caractéristiques</span>
+      <span style="display:flex;align-items:center;gap:.4rem">
+        <span style="font-size:.75rem;font-weight:400;color:var(--txt3);text-transform:none;letter-spacing:0;font-family:'Crimson Text',serif">Total alloué :</span>
+        <input type="number" id="mp-total-max" min="1" max="999" value="18" oninput="mpUpdateTotal()" style="width:64px;padding:.2rem .4rem;font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:var(--gl);background:rgba(184,151,58,.1);border:1px solid var(--bdr);border-radius:2px;text-align:center">
+      </span>
+      <span style="font-size:.8rem;color:var(--txt3)">Dépensé : <strong id="mp-total" style="color:var(--gl)">0</strong></span>
+    </div>
     <div id="mp-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:.7rem"></div>
     <div class="mst" style="margin-top:.5rem">Atouts (max 3)</div>
     <div class="af-select-list" id="mp-atouts-list"></div>
@@ -758,6 +782,9 @@ var DB={regions:[],maisons:[],persos:[],af:[],
   echelles:{}};
 
 function loadDB(){
+  // Si des données ont été injectées à l'export, elles ont déjà été assignées à DB avant cet appel
+  // On les sauvegarde dans localStorage puis on continue normalement
+  if(DB&&DB.regions&&DB.regions.length){saveDB();}
   var s=localStorage.getItem('cofas_v3');
   if(s){try{DB=JSON.parse(s);}catch(e){initDefault();}}
   else{initDefault();}
@@ -920,7 +947,10 @@ function pbColor(pct){
   return'linear-gradient(to right,#8b1a1a,#e07070)';
 }
 function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+// Poids géométriques (identiques à SCALES_DATA)
+var REGION_WEIGHTS=[1,2,3,5,8,12,18,26,38,55];
 function regionAvgStats(regionNom){
+  // Retourne la moyenne brute 1-10 (pour radar)
   var ms=DB.maisons.filter(function(m){return m.region===regionNom;});
   if(!ms.length)return null;
   var res={};
@@ -930,6 +960,50 @@ function regionAvgStats(regionNom){
   });
   return res;
 }
+function regionSumStats(regionNom){
+  // Retourne les valeurs réelles cumulées par stat (hommes, navires, dr.or, etc.)
+  var ms=DB.maisons.filter(function(m){return m.region===regionNom;});
+  if(!ms.length)return null;
+  var res={};
+  DB.caracMaison.forEach(function(c){
+    var sd=SCALES_DATA[c];
+    var totalMin=0,totalMax=0,totalWeight=0;
+    ms.forEach(function(m){
+      var v=clamp(Math.round(+(m.stats&&m.stats[c]?m.stats[c]:5)),1,10);
+      var idx=v-1;
+      if(sd&&sd.type==='quantitative'){
+        // Utilise les valeurs édités si dispo, sinon valeurs par défaut
+        var lvl=(DB.echelles.scales&&DB.echelles.scales[c]&&DB.echelles.scales[c][idx])?DB.echelles.scales[c][idx]:sd.levels[idx];
+        var mn=lvl?lvl[0]:0;
+        var mx=(lvl&&lvl[1]<999999)?lvl[1]:(mn*1.5);
+        totalMin+=mn;
+        totalMax+=mx;
+      } else {
+        totalWeight+=REGION_WEIGHTS[idx]||v;
+      }
+    });
+    if(sd&&sd.type==='quantitative'){
+      res[c]={type:'quantitative',min:totalMin,max:totalMax,unit:sd.unit,sort:totalMin};
+    } else {
+      res[c]={type:'score',weight:totalWeight,unit:sd?sd.unit:'pts',sort:totalWeight};
+    }
+  });
+  return res;
+}
+
+function fmtRegionVal(valObj,unit){
+  if(!valObj)return'—';
+  if(valObj.type==='quantitative'){
+    var u=unit||valObj.unit||'';
+    var minS=fmtScaleVal(valObj.min,u);
+    var maxS=fmtScaleVal(valObj.max,u);
+    return minS+' – '+maxS+'<br><span style="font-size:.65rem;color:var(--txt3)">'+h(u)+'</span>';
+  }
+  if(valObj.type==='score'){
+    return valObj.weight+' pts';
+  }
+  return String(valObj);
+}
 function factionAvgStats(faction){
   var ms=DB.maisons.filter(function(m){return m.faction===faction;});
   if(!ms.length)return null;
@@ -937,6 +1011,35 @@ function factionAvgStats(faction){
   DB.caracMaison.forEach(function(c){
     var s=ms.reduce(function(a,m){return a+(m.stats&&m.stats[c]?+m.stats[c]:5);},0);
     res[c]=Math.round(s/ms.length*10)/10;
+  });
+  return res;
+}
+function factionSumStats(faction){
+  // Retourne les valeurs réelles cumulées par stat (hommes, navires, dr.or, etc.) — identique à regionSumStats
+  var ms=DB.maisons.filter(function(m){return m.faction===faction;});
+  if(!ms.length)return null;
+  var res={};
+  DB.caracMaison.forEach(function(c){
+    var sd=SCALES_DATA[c];
+    var totalMin=0,totalMax=0,totalWeight=0;
+    ms.forEach(function(m){
+      var v=clamp(Math.round(+(m.stats&&m.stats[c]?m.stats[c]:5)),1,10);
+      var idx=v-1;
+      if(sd&&sd.type==='quantitative'){
+        var lvl=(DB.echelles.scales&&DB.echelles.scales[c]&&DB.echelles.scales[c][idx])?DB.echelles.scales[c][idx]:sd.levels[idx];
+        var mn=lvl?lvl[0]:0;
+        var mx=(lvl&&lvl[1]<999999)?lvl[1]:(mn*1.5);
+        totalMin+=mn;
+        totalMax+=mx;
+      } else {
+        totalWeight+=REGION_WEIGHTS[idx]||v;
+      }
+    });
+    if(sd&&sd.type==='quantitative'){
+      res[c]={type:'quantitative',min:totalMin,max:totalMax,unit:sd.unit,sort:totalMin};
+    } else {
+      res[c]={type:'score',weight:totalWeight,unit:sd?sd.unit:'pts',sort:totalWeight};
+    }
   });
   return res;
 }
@@ -1039,21 +1142,28 @@ function renderRegRanking(){
   cols.innerHTML='';
   selects.forEach(function(s){
     var stat=s.value;
-    var sorted=DB.regions.slice().map(function(r){
-      var st=regionAvgStats(r.nom);
-      return{nom:r.nom,val:st?+(st[stat]||0):0};
-    }).sort(function(a,b){return b.val-a.val;});
-    var max=sorted.length?sorted[0].val:1;
+    var sd=SCALES_DATA[stat];
+    var rows=DB.regions.slice().map(function(r){
+      var st=regionSumStats(r.nom);
+      var valObj=st?st[stat]:null;
+      var sortVal=valObj?valObj.sort:0;
+      return{nom:r.nom,valObj:valObj,sort:sortVal};
+    }).sort(function(a,b){return b.sort-a.sort;});
+    var maxSort=rows.length?rows[0].sort:1;
+    // Header: nom stat + unité si quantitative
+    var unit=sd?sd.unit:'';
+    var hdr=h(stat)+(unit?' <span style="font-size:.6rem;color:var(--txt3);font-weight:400;font-family:Crimson Text,serif">'+h(unit)+'</span>':'');
     var col=document.createElement('div');
-    col.innerHTML='<div class="ranking-col-hd">'+h(stat)+'</div><div class="ranking-col-body">'+
-      sorted.map(function(item,i){
+    col.innerHTML='<div class="ranking-col-hd">'+hdr+'</div><div class="ranking-col-body">'+
+      rows.map(function(item,i){
         var posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-        var pct=max>0?Math.round(item.val/max*100):0;
-        return '<div class="ranking-row">'+
-          '<div class="ranking-pos '+posClass+'">'+(i+1)+'</div>'+
+        var pct=maxSort>0?Math.round(item.sort/maxSort*100):0;
+        var dispHtml=fmtRegionVal(item.valObj,unit);
+        return '<div class="ranking-row" style="align-items:start">'+
+          '<div class="ranking-pos '+posClass+'" style="padding-top:.2rem">'+(i+1)+'</div>'+
           '<div><div class="ranking-name">'+h(item.nom)+'</div>'+
           '<div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:var(--gl)"></div></div></div>'+
-          '<div class="ranking-val">'+item.val+'</div></div>';
+          '<div class="ranking-val" style="font-size:.68rem;text-align:right;line-height:1.3">'+dispHtml+'</div></div>';
       }).join('')+'</div>';
     cols.appendChild(col);
   });
@@ -1284,16 +1394,28 @@ function renderFacRanking(){
   cols.innerHTML='';
   selects.forEach(function(s){
     var stat=s.value;
-    var sorted=FACTIONS.map(function(fac){var st=factionAvgStats(fac);return{nom:fac,val:st?+(st[stat]||0):0};}).sort(function(a,b){return b.val-a.val;});
-    var max=sorted.length?sorted[0].val:1;
+    var sd=SCALES_DATA[stat];
+    var unit=sd?sd.unit:'';
+    var rows=FACTIONS.map(function(fac){
+      var st=factionSumStats(fac);
+      var valObj=st?st[stat]:null;
+      var sortVal=valObj?valObj.sort:0;
+      return{nom:fac,valObj:valObj,sort:sortVal};
+    }).sort(function(a,b){return b.sort-a.sort;});
+    var maxSort=rows.length?rows[0].sort:1;
+    var hdr=h(stat)+(unit?' <span style="font-size:.6rem;color:var(--txt3);font-weight:400;font-family:Crimson Text,serif">'+h(unit)+'</span>':'');
     var col=document.createElement('div');
-    col.innerHTML='<div class="ranking-col-hd">'+h(stat)+'</div><div class="ranking-col-body">'+
-      sorted.map(function(item,i){
+    col.innerHTML='<div class="ranking-col-hd">'+hdr+'</div><div class="ranking-col-body">'+
+      rows.map(function(item,i){
         var posClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-        var pct=max>0?Math.round(item.val/max*100):0;
-        return '<div class="ranking-row"><div class="ranking-pos '+posClass+'">'+(i+1)+'</div>'+
-          '<div><div class="ranking-name">'+h(item.nom)+'</div><div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:var(--gl)"></div></div></div>'+
-          '<div class="ranking-val">'+item.val.toFixed(1)+'</div></div>';
+        var pct=maxSort>0?Math.round(item.sort/maxSort*100):0;
+        var dispHtml=fmtRegionVal(item.valObj,unit);
+        var facCol=item.nom==='Vert'?'#6dca8a':item.nom==='Rouge'?'#e07070':item.nom==='Noire'?'#a0a8e8':'#b0b0b0';
+        return '<div class="ranking-row" style="align-items:start">'+
+          '<div class="ranking-pos '+posClass+'" style="padding-top:.2rem">'+(i+1)+'</div>'+
+          '<div><div class="ranking-name" style="color:'+facCol+'">'+h(item.nom)+'</div>'+
+          '<div class="ranking-bar-bg"><div class="ranking-bar-fill" style="width:'+pct+'%;background:'+facCol+'"></div></div></div>'+
+          '<div class="ranking-val" style="font-size:.68rem;text-align:right;line-height:1.3">'+dispHtml+'</div></div>';
       }).join('')+'</div>';
     cols.appendChild(col);
   });
@@ -1474,12 +1596,13 @@ function openPersoModal(id){
   mpMaisonChange();
   var sg=document.getElementById('mp-stats-grid');
   sg.innerHTML='';
-  var max=DB.caracPerso.length*3;
-  document.getElementById('mp-total-max').textContent=max;
+  // Restaure le total alloué sauvegardé sur le perso, sinon 18 par défaut
+  var savedMax=p&&p.totalAlloue?p.totalAlloue:18;
+  document.getElementById('mp-total-max').value=savedMax;
   DB.caracPerso.forEach(function(c){
     var v=p&&p.stats?p.stats[c]||1:1;
     var inp=document.createElement('div');inp.className='mf';
-    inp.innerHTML='<label>'+h(c)+'</label><input type="number" min="1" max="5" value="'+v+'" data-carac="'+h(c)+'">';
+    inp.innerHTML='<label>'+h(c)+'</label><input type="number" min="1" max="999" value="'+v+'" data-carac="'+h(c)+'">';
     inp.querySelector('input').oninput=mpUpdateTotal;
     sg.appendChild(inp);
   });
@@ -1509,8 +1632,11 @@ function mpMaisonChange(){
 }
 function mpUpdateTotal(){
   var tot=0;
-  document.getElementById('mp-stats-grid').querySelectorAll('input').forEach(function(inp){tot+=clamp(+inp.value,1,5);});
-  document.getElementById('mp-total').textContent=tot;
+  document.getElementById('mp-stats-grid').querySelectorAll('input').forEach(function(inp){tot+=Math.max(1,+inp.value||1);});
+  var totEl=document.getElementById('mp-total');
+  totEl.textContent=tot;
+  var max=+document.getElementById('mp-total-max').value||18;
+  totEl.style.color=tot===max?'var(--green2)':tot>max?'var(--red2)':'var(--gl)';
 }
 function savePerso(){
   var nom=document.getElementById('mp-nom').value.trim();
@@ -1521,10 +1647,10 @@ function savePerso(){
   if(!maiId){alert.textContent='Sélectionnez une maison.';alert.style.display='block';return;}
   var stats={};var tot=0;
   document.getElementById('mp-stats-grid').querySelectorAll('input').forEach(function(inp){
-    var v=clamp(+inp.value,1,5);stats[inp.dataset.carac]=v;tot+=v;
+    var v=Math.max(1,+inp.value||1);stats[inp.dataset.carac]=v;tot+=v;
   });
-  var max=DB.caracPerso.length*3;
-  if(tot!==max){alert.textContent='Le total de points doit être exactement '+max+' (actuellement : '+tot+').';alert.style.display='block';return;}
+  var max=+document.getElementById('mp-total-max').value||18;
+  if(tot!==max){alert.textContent='Le total dépensé ('+tot+') doit correspondre au total alloué ('+max+').';alert.style.display='block';return;}
   var atouts=[];
   document.getElementById('mp-atouts-list').querySelectorAll('input:checked').forEach(function(inp){atouts.push(+inp.dataset.id);});
   if(atouts.length>3){alert.textContent='Maximum 3 atouts.';alert.style.display='block';return;}
@@ -1532,7 +1658,7 @@ function savePerso(){
   document.getElementById('mp-faib-list').querySelectorAll('input:checked').forEach(function(inp){faiblesses.push(+inp.dataset.id);});
   if(faiblesses.length>2){alert.textContent='Maximum 2 faiblesses.';alert.style.display='block';return;}
   var m=DB.maisons.find(function(x){return x.id===maiId;});
-  var data={nom:nom,maisonId:maiId,maisonNom:m?m.nom:'',region:m?m.region:'',stats:stats,atouts:atouts,faiblesses:faiblesses};
+  var data={nom:nom,maisonId:maiId,maisonNom:m?m.nom:'',region:m?m.region:'',stats:stats,atouts:atouts,faiblesses:faiblesses,totalAlloue:max};
   if(editingPersoId){
     var p=DB.persos.find(function(x){return x.id===editingPersoId;});
     if(p)Object.assign(p,data);
@@ -1689,36 +1815,172 @@ function deleteCaracPerso(idx){
 // ═══════════════════════════════════════
 var MODS_M_FIXED={1:'+4',2:'+2',3:'+1',4:'+1',5:'0',6:'0',7:'−1',8:'−2',9:'−3',10:'−4'};
 var MODS_P_FIXED={1:'+3',2:'+1',3:'0',4:'−1',5:'−3'};
+
+// Données quantitatives/qualitatives par caractéristique maison (issues de COFAS V20)
+var SCALES_DATA={
+  'Mil. Terrestre':{type:'quantitative',unit:'hommes',
+    levels:[[500,1000],[1000,2000],[2000,3500],[3500,5000],[5000,7000],[7000,10000],[10000,15000],[15000,22000],[22000,30000],[30000,999999]]},
+  'Mil. Naval':{type:'quantitative',unit:'navires',
+    levels:[[3,8],[8,15],[15,25],[25,40],[40,55],[55,80],[80,120],[120,160],[160,200],[200,999999]]},
+  'Terres':{type:'quantitative',unit:'dr.or/an',
+    levels:[[100,500],[500,1500],[1500,3000],[3000,6000],[6000,10000],[10000,18000],[18000,30000],[30000,50000],[50000,80000],[80000,999999]]},
+  'Commerce':{type:'quantitative',unit:'dr.or/an',
+    levels:[[0,200],[200,800],[800,2000],[2000,5000],[5000,10000],[10000,20000],[20000,40000],[40000,80000],[80000,150000],[150000,999999]]},
+  'Population':{type:'quantitative',unit:'millions hab.',
+    levels:[[0.001,0.005],[0.005,0.015],[0.015,0.03],[0.03,0.06],[0.06,0.12],[0.12,0.25],[0.25,0.5],[0.5,1.0],[1.0,2.0],[2.0,999999]]},
+  'Influence':{type:'score',unit:'pts influence',
+    descriptions:['Aucune influence hors de son fief','Influence marginale','Connue localement','Quelque poids régional','Vassal avec voix au chapitre','Influence régionale affirmée','Acteur politique régional majeur','Influence continentale notable','Poids décisif dans les grandes décisions','Influence absolue — maîtrise du jeu politique']},
+  'Diplomatie':{type:'score',unit:'pts diplomatie',
+    descriptions:['Aucun réseau diplomatique','Relations purement locales','Quelques contacts régionaux','Diplomatie modeste','Réseau d\'alliances standard','Diplomates actifs, alliances solides','Réseau inter-régional développé','Présence diplomatique continentale','Maîtrise des alliances à grande échelle','Diplomatie légendaire — toile continentale']},
+  'Cohésion':{type:'score',unit:'pts cohésion',
+    descriptions:['Maison au bord de l\'éclatement','Tensions internes sévères','Instabilité notable','Cohésion fragile','Stabilité standard','Maison unie, bonne loyauté interne','Forte cohésion, réponse rapide','Loyauté exemplaire, unité totale','Cohésion quasi-militaire','Loyauté absolue et légendaire']},
+  'Défensif':{type:'score',unit:'pts défensif',
+    descriptions:['Aucune fortification','Défenses symboliques','Palissades et tours basiques','Fortifications modestes','Château standard','Défenses solides, garnison efficace','Forteresse régionale imposante','Place forte majeure de Westeros','Quasi-imprenable en conditions normales','Forteresse légendaire — jamais prise']}
+};
+
+function fmtScaleVal(val,unit){
+  if(!unit)return val;
+  if(unit.indexOf('millions')>=0){
+    if(val>=1)return val.toFixed(1)+'M';
+    if(val>=0.01)return val.toFixed(3)+'M';
+    return val.toFixed(4)+'M';
+  }
+  if(unit.indexOf('dr')>=0){
+    if(val>=1000000)return(val/1000000).toFixed(1)+'M';
+    if(val>=1000)return Math.round(val/1000)+'k';
+  }
+  if(val>=1000)return val.toLocaleString('fr-FR');
+  return String(val);
+}
+
 function renderEchelles(){
   var ec=document.getElementById('echelles-content');
   if(!ec)return;
   if(!DB.echelles.maison)DB.echelles.maison={};
   if(!DB.echelles.perso)DB.echelles.perso={};
-  var html='<div class="scale-card"><h3>Échelle Maison (1-10)</h3>'+
+
+  var html='';
+
+  // ── Bloc D20 modificateurs Maison ──
+  html+='<div class="scale-card" style="margin-bottom:1rem"><h3>Modificateurs D20 — Caractéristiques Maison (1-10)</h3>'+
+    '<p style="font-size:.78rem;color:var(--txt3);font-style:italic;margin-bottom:.7rem">Ces modificateurs s\'appliquent au seuil de difficulté lors des jets de dés.</p>'+
     '<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.5rem;margin-bottom:.5rem">'+
-    '<span class="fl" style="margin:0">Niv.</span><span class="fl" style="margin:0">Modif.</span><span class="fl" style="margin:0">Description</span></div>';
+    '<span class="fl" style="margin:0">Niv.</span><span class="fl" style="margin:0">Modif.</span><span class="fl" style="margin:0">Description personnalisée</span></div>';
   for(var i=1;i<=10;i++){
     var desc=DB.echelles.maison[i]||'';
     var modColor=i<=4?'color:var(--green2)':i<=6?'color:var(--txt3)':'color:var(--red2)';
     html+='<div class="scale-row">'+
       '<div class="scale-lvl">'+i+'</div>'+
       '<div class="scale-mod" style="'+modColor+'">'+MODS_M_FIXED[i]+'</div>'+
-      '<input class="scale-desc-inp" type="text" value="'+h(desc)+'" placeholder="Description..." data-type="maison" data-lvl="'+i+'" onchange="saveEchelleDesc(\'maison\','+i+',this.value)">'+
+      '<input class="scale-desc-inp" type="text" value="'+h(desc)+'" placeholder="Description..." onchange="saveEchelleDesc(\'maison\','+i+',this.value)">'+
       '</div>';
   }
-  html+='</div><div class="scale-card"><h3>Échelle Personnage (1-5)</h3>'+
+  html+='</div>';
+
+  // ── Bloc D20 modificateurs Personnage ──
+  html+='<div class="scale-card" style="margin-bottom:1.5rem"><h3>Modificateurs D20 — Caractéristiques Personnage (1-5)</h3>'+
+    '<p style="font-size:.78rem;color:var(--txt3);font-style:italic;margin-bottom:.7rem">Ces modificateurs s\'appliquent lors des actions personnage.</p>'+
     '<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.5rem;margin-bottom:.5rem">'+
-    '<span class="fl" style="margin:0">Niv.</span><span class="fl" style="margin:0">Modif.</span><span class="fl" style="margin:0">Description</span></div>';
+    '<span class="fl" style="margin:0">Niv.</span><span class="fl" style="margin:0">Modif.</span><span class="fl" style="margin:0">Description personnalisée</span></div>';
   for(var j=1;j<=5;j++){
     var desc2=DB.echelles.perso[j]||'';
     var modColor2=j<=2?'color:var(--green2)':j===3?'color:var(--txt3)':'color:var(--red2)';
     html+='<div class="scale-row">'+
       '<div class="scale-lvl">'+j+'</div>'+
       '<div class="scale-mod" style="'+modColor2+'">'+MODS_P_FIXED[j]+'</div>'+
-      '<input class="scale-desc-inp" type="text" value="'+h(desc2)+'" placeholder="Description..." data-type="perso" data-lvl="'+j+'" onchange="saveEchelleDesc(\'perso\','+j+',this.value)">'+
+      '<input class="scale-desc-inp" type="text" value="'+h(desc2)+'" placeholder="Description..." onchange="saveEchelleDesc(\'perso\','+j+',this.value)">'+
       '</div>';
   }
   html+='</div>';
+
+  // ── Section titre ──
+  html+='<div style="font-family:\'Cinzel\',serif;font-size:.75rem;font-weight:600;color:var(--gl);text-transform:uppercase;letter-spacing:.12em;'+
+    'margin-bottom:1rem;padding:.5rem 0;border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);">'+
+    'Échelles de référence par caractéristique Maison</div>';
+
+  html+='<p style="font-size:.8rem;color:var(--txt3);font-style:italic;margin-bottom:1.2rem">'+
+    'Ces fourchettes concrètes donnent un sens narratif à chaque niveau (1-10). '+
+    'Les caractéristiques quantitatives indiquent des valeurs réelles ; les qualitatives donnent une description.</p>';
+
+  // ── Caractéristiques quantitatives ──
+  html+='<div style="font-family:\'Cinzel\',serif;font-size:.68rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Caractéristiques quantitatives</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-bottom:1.5rem;">';
+
+  ['Mil. Terrestre','Mil. Naval','Terres','Commerce','Population'].forEach(function(stat){
+    var sd=SCALES_DATA[stat];
+    if(!sd)return;
+    html+='<div class="scale-card">';
+    html+='<h3 style="display:flex;justify-content:space-between;align-items:baseline;">'+
+      '<span>'+h(stat)+'</span>'+
+      '<span style="font-family:\'Crimson Text\',serif;font-size:.72rem;font-weight:400;color:var(--txt3);text-transform:none;letter-spacing:0">'+h(sd.unit)+'</span>'+
+      '</h3>';
+    html+='<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.4rem;align-items:center;'+
+      'margin-bottom:.4rem;padding-bottom:.3rem;border-bottom:1px solid var(--bdr2)">'+
+      '<span style="font-family:\'Cinzel\',serif;font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em">Niv.</span>'+
+      '<span style="font-family:\'Cinzel\',serif;font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em">Modif.</span>'+
+      '<span style="font-family:\'Cinzel\',serif;font-size:.58rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em">Fourchette</span>'+
+      '</div>';
+    for(var k=0;k<10;k++){
+      var lvl=k+1;
+      var range=sd.levels[k]||[0,0];
+      var isInf=range[1]>=999999;
+      var minStr=fmtScaleVal(range[0],sd.unit);
+      var maxStr=isInf?'∞':fmtScaleVal(range[1],sd.unit);
+      var mod=MODS_M_FIXED[lvl];
+      var modC=lvl<=4?'var(--green2)':lvl<=6?'var(--txt3)':'var(--red2)';
+      var rowBg=k%2===0?'rgba(0,0,0,.12)':'transparent';
+      // Récupère valeurs editées depuis DB.echelles.scales si dispo
+      var editedMin=(DB.echelles.scales&&DB.echelles.scales[stat]&&DB.echelles.scales[stat][k])?DB.echelles.scales[stat][k][0]:range[0];
+      var editedMax=(DB.echelles.scales&&DB.echelles.scales[stat]&&DB.echelles.scales[stat][k]&&DB.echelles.scales[stat][k][1]!==undefined)?DB.echelles.scales[stat][k][1]:range[1];
+      var isInfEdit=editedMax>=999999;
+      html+='<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.4rem;align-items:center;'+
+        'padding:.22rem .3rem;border-radius:2px;background:'+rowBg+'">'+
+        '<span style="font-family:\'Cinzel\',serif;font-size:.72rem;font-weight:700;color:var(--gl);text-align:center">'+lvl+'</span>'+
+        '<span style="font-family:\'Cinzel\',serif;font-size:.68rem;font-weight:700;color:'+modC+';text-align:center">'+mod+'</span>'+
+        '<div style="display:flex;align-items:center;gap:.3rem">'+
+          '<input type="number" value="'+editedMin+'" min="0" style="width:80px;padding:.18rem .3rem;font-size:.75rem;background:rgba(0,0,0,.25);border:1px solid rgba(184,151,58,.3);border-radius:2px;color:var(--txt2);text-align:center" onchange="saveScaleLevel(\''+stat+'\','+k+',0,this.value)">'+
+          '<span style="color:var(--txt3);font-size:.7rem">–</span>'+
+          '<input type="number" value="'+(isInfEdit?'':editedMax)+'" min="0" placeholder="∞" style="width:80px;padding:.18rem .3rem;font-size:.75rem;background:rgba(0,0,0,.25);border:1px solid rgba(184,151,58,.3);border-radius:2px;color:'+(isInfEdit?'var(--gl)':'var(--txt2)')+';text-align:center" onchange="saveScaleLevel(\''+stat+'\','+k+',1,this.value)">'+
+          '<span style="font-size:.65rem;color:var(--txt3)">'+h(sd.unit)+'</span>'+
+        '</div>'+
+        '</div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+
+  // ── Caractéristiques qualitatives ──
+  html+='<div style="font-family:\'Cinzel\',serif;font-size:.68rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem;">Caractéristiques qualitatives</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;">';
+
+  ['Influence','Diplomatie','Cohésion','Défensif'].forEach(function(stat){
+    var sd=SCALES_DATA[stat];
+    if(!sd)return;
+    html+='<div class="scale-card">';
+    html+='<h3>'+h(stat)+'</h3>';
+    html+='<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.4rem;align-items:center;'+
+      'margin-bottom:.4rem;padding-bottom:.3rem;border-bottom:1px solid var(--bdr2)">'+
+      '<span style="font-family:\'Cinzel\',serif;font-size:.58rem;color:var(--txt3);text-transform:uppercase;">Niv.</span>'+
+      '<span style="font-family:\'Cinzel\',serif;font-size:.58rem;color:var(--txt3);text-transform:uppercase;">Modif.</span>'+
+      '<span style="font-family:\'Cinzel\',serif;font-size:.58rem;color:var(--txt3);text-transform:uppercase;">Description</span>'+
+      '</div>';
+    for(var m=0;m<10;m++){
+      var lvl2=m+1;
+      var desc3=(DB.echelles.descs&&DB.echelles.descs[stat]&&DB.echelles.descs[stat][m]!==undefined)?DB.echelles.descs[stat][m]:((sd.descriptions&&sd.descriptions[m])||'');
+      var mod2=MODS_M_FIXED[lvl2];
+      var modC2=lvl2<=4?'var(--green2)':lvl2<=6?'var(--txt3)':'var(--red2)';
+      var rowBg2=m%2===0?'rgba(0,0,0,.12)':'transparent';
+      html+='<div style="display:grid;grid-template-columns:28px 60px 1fr;gap:.4rem;align-items:center;'+
+        'padding:.22rem .3rem;border-radius:2px;background:'+rowBg2+'">'+
+        '<span style="font-family:\'Cinzel\',serif;font-size:.72rem;font-weight:700;color:var(--gl);text-align:center">'+lvl2+'</span>'+
+        '<span style="font-family:\'Cinzel\',serif;font-size:.68rem;font-weight:700;color:'+modC2+';text-align:center">'+mod2+'</span>'+
+        '<input type="text" value="'+h(desc3)+'" placeholder="Description niveau '+lvl2+'..." style="width:100%;padding:.18rem .4rem;font-size:.78rem;background:rgba(0,0,0,.25);border:1px solid rgba(184,151,58,.3);border-radius:2px;color:var(--txt2);font-style:italic" onchange="saveScaleDesc(\''+stat+'\','+m+',this.value)">'+
+        '</div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+
   ec.innerHTML=html;
 }
 function saveEchelleDesc(type,lvl,val){
@@ -1726,24 +1988,46 @@ function saveEchelleDesc(type,lvl,val){
   DB.echelles[type][lvl]=val;
   saveDB();
 }
+function saveScaleLevel(stat,levelIdx,minOrMax,val){
+  if(!DB.echelles.scales)DB.echelles.scales={};
+  if(!DB.echelles.scales[stat])DB.echelles.scales[stat]={};
+  if(!DB.echelles.scales[stat][levelIdx]){
+    // Copie les valeurs d'origine depuis SCALES_DATA
+    var orig=SCALES_DATA[stat]&&SCALES_DATA[stat].levels?SCALES_DATA[stat].levels[levelIdx]:[0,0];
+    DB.echelles.scales[stat][levelIdx]=[orig[0],orig[1]];
+  }
+  var v=parseFloat(val);
+  if(minOrMax===1&&(!val||val===''))v=999999;
+  DB.echelles.scales[stat][levelIdx][minOrMax]=isNaN(v)?0:v;
+  saveDB();
+}
+function saveScaleDesc(stat,levelIdx,val){
+  if(!DB.echelles.descs)DB.echelles.descs={};
+  if(!DB.echelles.descs[stat])DB.echelles.descs[stat]={};
+  DB.echelles.descs[stat][levelIdx]=val;
+  saveDB();
+}
 
 // ═══════════════════════════════════════
 // PARAMÈTRES — ATOUTS & FAIBLESSES
 // ═══════════════════════════════════════
 function renderAFRef(){
-  var list=document.getElementById('af-ref-list');
-  if(!list)return;
-  list.innerHTML=DB.af.map(function(a){
-    return '<div class="af-ref-row">'+
-      '<input type="text" value="'+h(a.nom)+'" onchange="afUpdate('+a.id+',\'nom\',this.value)">'+
-      '<select onchange="afUpdate('+a.id+',\'type\',this.value)">'+
-        '<option value="atout" '+(a.type==='atout'?'selected':'')+'>Atout</option>'+
-        '<option value="faiblesse" '+(a.type==='faiblesse'?'selected':'')+'>Faiblesse</option>'+
-      '</select>'+
-      '<input type="text" value="'+h(a.desc)+'" onchange="afUpdate('+a.id+',\'desc\',this.value)" placeholder="Condition / description">'+
+  var atoutsEl=document.getElementById('af-atouts-list');
+  var faibEl=document.getElementById('af-faib-list');
+  // fallback for legacy single-list context
+  var legacyEl=document.getElementById('af-ref-list');
+  function makeRow(a){
+    return '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;align-items:center;background:rgba(0,0,0,.15);border:1px solid rgba(184,151,58,.15);border-radius:2px;padding:.3rem .45rem;margin-bottom:.3rem">'+
+      '<input type="text" value="'+h(a.nom)+'" style="background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.2);padding:.1rem .2rem;font-size:.82rem;color:var(--txt2)" onchange="afUpdate('+a.id+',\'nom\',this.value)">'+
+      '<input type="text" value="'+h(a.desc)+'" style="background:transparent;border:none;border-bottom:1px solid rgba(184,151,58,.2);padding:.1rem .2rem;font-size:.82rem;color:var(--txt3)" onchange="afUpdate('+a.id+',\'desc\',this.value)" placeholder="Condition / description">'+
       '<button class="rm" onclick="afDelete('+a.id+')">✕</button>'+
       '</div>';
-  }).join('');
+  }
+  var atouts=DB.af.filter(function(a){return a.type==='atout';});
+  var faibs=DB.af.filter(function(a){return a.type==='faiblesse';});
+  if(atoutsEl) atoutsEl.innerHTML=atouts.map(makeRow).join('');
+  if(faibEl)   faibEl.innerHTML=faibs.map(makeRow).join('');
+  if(legacyEl) legacyEl.innerHTML=DB.af.map(makeRow).join('');
 }
 function afUpdate(id,field,val){
   var a=DB.af.find(function(x){return x.id===id;});
@@ -2179,6 +2463,54 @@ function fmCopy(){
   });
 }
 
+// ═══════════════════════════════════════
+// EXPORT HTML
+// ═══════════════════════════════════════
+function exportHTML(){
+  // Injection propre : on lit le fichier source original via fetch
+  // puis on injecte les données DB actuelles comme un bloc JSON au démarrage
+  var dbJson=JSON.stringify(DB);
+  var startTag='/* __COFAS_DATA_START__ */';
+  var endTag='/* __COFAS_DATA_END__ */';
+  var dataBlock=startTag+'\nDB='+dbJson+';\n'+endTag;
+
+  function doExport(src){
+    // Supprime un éventuel bloc précédent
+    var s=src.indexOf(startTag);
+    var e=src.indexOf(endTag);
+    if(s>=0&&e>=0){
+      src=src.substring(0,s)+src.substring(e+endTag.length);
+    }
+    // Injecte juste après la déclaration var MOD_M= dans le JS
+    var anchor='var MOD_M=';
+    var pos=src.indexOf(anchor);
+    if(pos>=0){
+      src=src.substring(0,pos)+dataBlock+'\n'+src.substring(pos);
+    }
+    var d=new Date();
+    var fname='COFAS_'+d.getFullYear()+
+      (d.getMonth()+1<10?'0':'')+(d.getMonth()+1)+
+      (d.getDate()<10?'0':'')+d.getDate()+'.html';
+    var blob=new Blob([src],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download=fname;
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    var badge=document.getElementById('export-badge');
+    if(badge){badge.style.display='inline';setTimeout(function(){badge.style.display='none';},3000);}
+  }
+
+  // Tente de récupérer le source original via fetch
+  fetch(location.href)
+    .then(function(r){return r.text();})
+    .then(function(src){doExport(src);})
+    .catch(function(){
+      // Fallback : outerHTML (moins propre mais fonctionnel en local)
+      doExport(document.documentElement.outerHTML);
+    });
+}
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
