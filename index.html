@@ -456,9 +456,95 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
   </div>
   <div class="sub-page" id="actions-region">
     <div class="page-wrap">
-      <div class="wip-box"><div class="wip-icon">🏗</div>
-        <h3>Action Région — En construction</h3>
-        <p>Cette section sera complétée ultérieurement.</p>
+      <div class="rc">
+        <div class="rl">Action Régionale en cours</div>
+        <div class="ra" id="ar-ra">--</div>
+        <div class="rm2">
+          <div style="text-align:center"><span class="sn" id="ar-sn">--</span><span class="ss-label">Seuil final (D20 ≥)</span></div>
+          <div class="rdiv"></div>
+          <div style="text-align:center"><span class="pn pm" id="ar-pn">--</span><span class="ss-label">Chances de succès</span></div>
+        </div>
+        <div class="pb-wrap"><div class="pb" id="ar-pb" style="width:0%"></div></div>
+        <div id="ar-ss-wrap" style="display:none">
+          <div class="ss-grid">
+            <div><div class="ss-title">Barres</div><div id="ar-sbars"></div></div>
+            <div><div class="ss-title">Décomposition</div><div id="ar-decomp"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Nom de l'action</div>
+        <input type="text" id="ar-name" placeholder="Ex : Organiser un tournoi au Bief..." oninput="arRecalc()">
+      </div>
+      <div class="card"><div class="ct">Difficulté de base</div>
+        <div class="diff-grid">
+          <button class="diff-btn facile" onclick="arSetDiff(6,this)"><span class="dl">Facile</span><span class="ds">6</span><span class="dd">Tâche courante</span></button>
+          <button class="diff-btn moyenne" onclick="arSetDiff(10,this)"><span class="dl">Moyenne</span><span class="ds">10</span><span class="dd">Situation complexe</span></button>
+          <button class="diff-btn difficile" onclick="arSetDiff(14,this)"><span class="dl">Difficile</span><span class="ds">14</span><span class="dd">Situation exceptionnelle</span></button>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Région</div>
+        <div class="g2" style="margin-bottom:.7rem">
+          <div><label class="fl">Sélectionner la région</label>
+            <select id="ar-region-sel" onchange="arOnRegionChange()"><option value="">-- Choisir --</option></select>
+          </div>
+          <div id="ar-cohesion-badge" style="display:flex;align-items:flex-end;padding-bottom:.3rem"></div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Caractéristique mobilisée</div>
+        <p style="font-size:.8rem;color:var(--txt3);font-style:italic;margin-bottom:.6rem">Une seule caractéristique, appliquée à toutes les maisons impliquées.</p>
+        <div class="carac-grid" id="ar-carac-grid"></div>
+      </div>
+      <div class="card"><div class="ct">Maison pilote</div>
+        <div class="g2">
+          <div><label class="fl">Maison à l'initiative</label>
+            <select id="ar-mai-pilote" onchange="arOnMaisonChange()"><option value="">-- Choisir --</option></select>
+          </div>
+          <div id="ar-mai-pilote-badge" style="display:flex;align-items:flex-end;padding-bottom:.3rem"></div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Maisons en soutien <span style="font-family:'Crimson Text',serif;font-size:.8rem;font-weight:400;color:var(--txt3);text-transform:none;letter-spacing:0">(optionnel — jusqu'à 2, modificateur ÷ 2)</span></div>
+        <div class="g2" style="margin-bottom:.5rem">
+          <div><label class="fl">Soutien 1</label>
+            <select id="ar-mai-soutien1" onchange="arRecalc()"><option value="">-- Aucune --</option></select>
+          </div>
+          <div><label class="fl">Soutien 2</label>
+            <select id="ar-mai-soutien2" onchange="arRecalc()"><option value="">-- Aucune --</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="ct">Personnage pilote <span style="font-family:'Crimson Text',serif;font-size:.8rem;font-weight:400;color:var(--txt3);text-transform:none;letter-spacing:0">(optionnel)</span></div>
+        <div class="g2" style="margin-bottom:.7rem">
+          <div><label class="fl">Personnage de la région</label>
+            <select id="ar-perso-sel" onchange="arOnPersoChange()"><option value="">-- Aucun --</option></select>
+          </div>
+          <div><label class="fl">Caractéristique utilisée</label>
+            <select id="ar-perso-carac" onchange="arRecalc()"><option value="">-- Aucune --</option></select>
+          </div>
+        </div>
+        <div id="ar-perso-badge"></div>
+      </div>
+      <div class="card"><div class="ct">Atouts & Faiblesses applicables</div>
+        <div id="ar-af-list"><p style="font-size:.82rem;color:var(--txt3);font-style:italic">Sélectionnez un personnage pilote.</p></div>
+      </div>
+      <div class="card"><div class="ct">Bonus / Malus contextuels</div>
+        <div id="ar-ctx-list"></div>
+        <button class="ab" onclick="arAddCtx()">+ Ajouter un modificateur contextuel</button>
+      </div>
+      <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem">
+        <button class="reset-btn" onclick="arReset()">Réinitialiser</button>
+        <button class="forum-btn" id="ar-forum-btn" onclick="openForumModal('region')" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+          Générer le code forum
+        </button>
+      </div>
+      <div class="sticky-bar" id="ar-sticky">
+        <div><span style="font-family:'Cinzel',serif;font-size:.63rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.12em" id="ar-st-act">--</span><br>
+          <span style="font-family:'Cinzel',serif;font-size:.68rem;color:var(--txt3)" id="ar-st-diff">--</span></div>
+        <div style="display:flex;align-items:baseline;gap:.5rem">
+          <span style="font-family:'Cinzel',serif;font-size:.72rem;color:var(--txt3)">D20 ≥</span>
+          <span style="font-family:'Cinzel',serif;font-size:2.2rem;font-weight:700;color:var(--gl);line-height:1" id="ar-st-sn">--</span>
+          <span style="font-family:'Cinzel',serif;font-size:1.1rem;font-weight:600;line-height:1" id="ar-st-pn">--</span>
+        </div>
       </div>
     </div>
   </div>
@@ -909,7 +995,7 @@ function switchMain(page,btn){
   if(page==='bdd'){refreshBddFilters();renderBddRegions();}
   if(page==='params'){renderCaracMaison();renderCaracPerso();renderEchelles();renderAFRef();}
   if(page==='comparatif'){initCompRegions();}
-  if(page==='actions'){refreshActionPersoSelects();refreshActionMaisonSelects();}
+  if(page==='actions'){refreshActionPersoSelects();refreshActionMaisonSelects();refreshActionRegionSelects();}
 }
 function switchSub(page,sub,btn){
   document.getElementById('subnav-'+page).querySelectorAll('.sub-tab').forEach(function(b){b.classList.remove('active');});
@@ -937,6 +1023,7 @@ function switchSub(page,sub,btn){
   if(page==='actions'){
     if(sub==='perso')refreshActionPersoSelects();
     if(sub==='maison')refreshActionMaisonSelects();
+    if(sub==='region')refreshActionRegionSelects();
   }
 }
 function switchInner(prefix,panel,btn){
@@ -2491,6 +2578,253 @@ function amReset(){
   amBuildCaracGrid();amBuildAFList();
 }
 
+
+// ═══════════════════════════════════════
+// ACTION RÉGION
+// ═══════════════════════════════════════
+var arState={diff:null,regionId:null,caracSel:null,maiPiloteId:null,maiSoutien1Id:null,maiSoutien2Id:null,persoId:null,persoCarac:null,afChecked:[]};
+
+function getCohMod(regionId){
+  var r=regionId?DB.regions.find(function(x){return x.id===regionId;}):null;
+  if(!r)return 0;
+  var pct=r.cohesionPct||0;
+  var paliers=getCohPaliers();
+  for(var i=0;i<paliers.length;i++){
+    var p=paliers[i];
+    var match=(i===paliers.length-1)?(pct>=p.min&&pct<=p.max):(pct>=p.min&&pct<p.max);
+    if(match){
+      // Divisée+3, Tendue+1, Stable 0, Soudée-1, Unie-2
+      var mods=[3,1,0,-1,-2];
+      return mods[i]!==undefined?mods[i]:0;
+    }
+  }
+  return 0;
+}
+
+function refreshActionRegionSelects(){
+  var rsel=document.getElementById('ar-region-sel');
+  if(!rsel)return;
+  var rcur=+rsel.value;
+  rsel.innerHTML='<option value="">-- Choisir --</option>';
+  DB.regions.forEach(function(r){var o=document.createElement('option');o.value=r.id;o.textContent=r.nom;if(rcur===r.id)o.selected=true;rsel.appendChild(o);});
+  arOnRegionChange();
+}
+
+function arOnRegionChange(){
+  var rid=+document.getElementById('ar-region-sel').value;
+  arState.regionId=rid||null;
+  arState.maiPiloteId=null;arState.maiSoutien1Id=null;arState.maiSoutien2Id=null;
+  arState.persoId=null;arState.persoCarac=null;arState.afChecked=[];
+  // Badge cohésion
+  var badge=document.getElementById('ar-cohesion-badge');
+  if(badge){
+    var r=rid?DB.regions.find(function(x){return x.id===rid;}):null;
+    if(r){
+      var pct=r.cohesionPct||0;
+      var col=getCohesionColor(pct);
+      var lbl=getCohesionLabel(pct);
+      var mod=getCohMod(rid);
+      var modStr=(mod>0?'+':'')+mod;
+      badge.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:.72rem;font-weight:700;color:'+col+';padding:.2rem .6rem;border:1px solid '+col+';border-radius:2px;background:rgba(0,0,0,.2)">'+
+        h(lbl)+' — '+pct+'%'+
+        '<span style="margin-left:.5rem;font-size:.65rem;color:'+(mod>0?'var(--red2)':mod<0?'var(--green2)':'var(--txt3)')+'">cohésion '+modStr+'</span>'+
+        '</div>';
+    } else { badge.innerHTML=''; }
+  }
+  // Maisons de la région
+  var maisons=rid?DB.maisons.filter(function(m){return m.region===(DB.regions.find(function(r){return r.id===rid;})||{}).nom;}):[];
+  ['ar-mai-pilote','ar-mai-soutien1','ar-mai-soutien2'].forEach(function(sid,i){
+    var sel=document.getElementById(sid);
+    if(!sel)return;
+    sel.innerHTML=(i===0?'<option value="">-- Choisir --</option>':'<option value="">-- Aucune --</option>');
+    maisons.forEach(function(m){var o=document.createElement('option');o.value=m.id;o.textContent=m.nom;sel.appendChild(o);});
+  });
+  // Personnages de la région
+  var regionNom=rid?(DB.regions.find(function(x){return x.id===rid;})||{}).nom:'';
+  var maisonNomsRegion=maisons.map(function(m){return m.nom;});
+  var persos=DB.persos.filter(function(p){return maisonNomsRegion.indexOf(p.maison)!==-1;});
+  var psel=document.getElementById('ar-perso-sel');
+  if(psel){
+    psel.innerHTML='<option value="">-- Aucun --</option>';
+    persos.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.nom+(p.maison?' ('+p.maison+')':'');psel.appendChild(o);});
+  }
+  arBuildCaracGrid();
+  arOnMaisonChange();
+  arRecalc();
+}
+
+function arOnMaisonChange(){
+  var mid=+document.getElementById('ar-mai-pilote').value;
+  arState.maiPiloteId=mid||null;
+  var badge=document.getElementById('ar-mai-pilote-badge');
+  if(badge){
+    var m=mid?DB.maisons.find(function(x){return x.id===mid;}):null;
+    badge.innerHTML=m?'<span class="fb fb-'+h(m.faction)+'">'+h(m.faction)+'</span>':'';
+  }
+  arRecalc();
+}
+
+function arBuildCaracGrid(){
+  var grid=document.getElementById('ar-carac-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  DB.caracMaison.forEach(function(c){
+    var active=arState.caracSel===c;
+    var btn=document.createElement('button');
+    btn.className='carac-btn'+(active?' active':'');
+    btn.innerHTML='<span class="cbl">'+h(c)+'</span>';
+    (function(carac){btn.onclick=function(){
+      arState.caracSel=(arState.caracSel===carac)?null:carac;
+      arBuildCaracGrid();arRecalc();
+    };})(c);
+    grid.appendChild(btn);
+  });
+}
+
+function arOnPersoChange(){
+  var pid=+document.getElementById('ar-perso-sel').value;
+  arState.persoId=pid||null;arState.persoCarac=null;arState.afChecked=[];
+  var csel=document.getElementById('ar-perso-carac');
+  if(csel){
+    csel.innerHTML='<option value="">-- Aucune --</option>';
+    if(pid){DB.caracPerso.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;csel.appendChild(o);});}
+  }
+  // Badge perso
+  var badge=document.getElementById('ar-perso-badge');
+  if(badge){
+    var p=pid?DB.persos.find(function(x){return x.id===pid;}):null;
+    badge.innerHTML=p&&p.maison?'<span style="font-size:.78rem;color:var(--txt3);font-style:italic">'+h(p.maison)+'</span>':'';
+  }
+  arBuildAFList();arRecalc();
+}
+
+function arBuildAFList(){
+  var list=document.getElementById('ar-af-list');if(!list)return;
+  var p=arState.persoId?DB.persos.find(function(x){return x.id===arState.persoId;}):null;
+  if(!p){list.innerHTML='<p style="font-size:.82rem;color:var(--txt3);font-style:italic">Sélectionnez un personnage pilote.</p>';return;}
+  var afIds=[...(p.atouts||[]),...(p.faiblesses||[])];
+  if(!afIds.length){list.innerHTML='<p style="font-size:.82rem;color:var(--txt3);font-style:italic">Aucun atout/faiblesse assigné.</p>';return;}
+  list.innerHTML='<div class="af-check-list">'+afIds.map(function(aid){
+    var a=DB.af.find(function(x){return x.id===aid;});if(!a)return'';
+    var checked=arState.afChecked.indexOf(aid)!==-1;
+    var tag=a.type==='atout'?'<span class="tag-atout">Atout −2</span>':'<span class="tag-faib">Faiblesse +2</span>';
+    return '<label class="af-check-item"><input type="checkbox" '+(checked?'checked':'')+' style="accent-color:var(--gl)" onchange="arToggleAF('+aid+',this.checked)">'+
+      '<span class="afn">'+h(a.nom)+'</span><span class="afd">'+h(a.desc)+'</span>'+tag+'</label>';
+  }).join('')+'</div>';
+}
+
+function arToggleAF(id,checked){
+  if(checked){if(arState.afChecked.indexOf(id)===-1)arState.afChecked.push(id);}
+  else{arState.afChecked=arState.afChecked.filter(function(x){return x!==id;});}
+  arRecalc();
+}
+
+function arAddCtx(){
+  var div=document.createElement('div');div.className='malus-row';
+  div.innerHTML='<input type="text" placeholder="Label..." oninput="arRecalc()"><input type="number" value="0" oninput="arRecalc()"><button class="rm" onclick="this.parentElement.remove();arRecalc()">✕</button>';
+  document.getElementById('ar-ctx-list').appendChild(div);arRecalc();
+}
+
+function arSetDiff(val,btn){
+  arState.diff=val;
+  document.querySelectorAll('#actions-region .diff-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('ar-forum-btn').disabled=false;
+  arRecalc();
+}
+
+function arRecalc(){
+  if(arState.diff===null)return;
+  var decomp=[];var total=arState.diff;
+  decomp.push({label:'Difficulté de base',val:'+'+arState.diff,raw:arState.diff,type:'base'});
+
+  // Cohésion régionale
+  var cohMod=getCohMod(arState.regionId);
+  if(arState.regionId&&cohMod!==0){
+    var r=DB.regions.find(function(x){return x.id===arState.regionId;});
+    var lbl=r?getCohesionLabel(r.cohesionPct||0):'Cohésion';
+    total+=cohMod;
+    decomp.push({label:'Cohésion — '+lbl,val:(cohMod>0?'+':'')+cohMod,raw:cohMod,type:cohMod<0?'neg':cohMod>0?'pos':'zer'});
+  }
+
+  // Maison pilote (score plein)
+  if(arState.maiPiloteId&&arState.caracSel){
+    var mp=DB.maisons.find(function(x){return x.id===arState.maiPiloteId;});
+    if(mp&&mp.stats){
+      var v=mp.stats[arState.caracSel]||5;var mod=MOD_M[v]||0;
+      total+=mod;decomp.push({label:h(mp.nom)+' [pilote] — '+h(arState.caracSel)+' ('+v+')',val:(mod>0?'+':'')+mod,raw:mod,type:mod<0?'neg':mod>0?'pos':'zer'});
+    }
+  }
+
+  // Maisons en soutien (score ÷ 2, arrondi)
+  [document.getElementById('ar-mai-soutien1'),document.getElementById('ar-mai-soutien2')].forEach(function(sel,si){
+    if(!sel)return;
+    var sid=+sel.value;
+    if(!sid||!arState.caracSel)return;
+    var ms=DB.maisons.find(function(x){return x.id===sid;});
+    if(!ms||!ms.stats)return;
+    var sv=ms.stats[arState.caracSel]||5;var smod=MOD_M[sv]||0;
+    var smodHalf=Math.round(smod/2);
+    total+=smodHalf;
+    decomp.push({label:h(ms.nom)+' [soutien '+(si+1)+'] — '+h(arState.caracSel)+' ('+sv+') ÷2',val:(smodHalf>0?'+':'')+smodHalf,raw:smodHalf,type:smodHalf<0?'neg':smodHalf>0?'pos':'zer'});
+  });
+
+  // Personnage pilote
+  var persoCaracSel=(document.getElementById('ar-perso-carac')||{}).value;
+  var p=arState.persoId?DB.persos.find(function(x){return x.id===arState.persoId;}):null;
+  if(p&&persoCaracSel&&p.stats){
+    var pv=p.stats[persoCaracSel]||1;var pm=MOD_P[pv]||0;
+    total+=pm;decomp.push({label:h(p.nom)+' — '+h(persoCaracSel)+' ('+pv+')',val:(pm>0?'+':'')+pm,raw:pm,type:pm<0?'neg':pm>0?'pos':'zer'});
+  }
+
+  // Atouts & Faiblesses
+  arState.afChecked.forEach(function(aid){
+    var a=DB.af.find(function(x){return x.id===aid;});if(!a)return;
+    var delta=a.type==='atout'?-2:+2;total+=delta;
+    decomp.push({label:a.nom,val:(delta>0?'+':'')+delta,raw:delta,type:a.type==='atout'?'neg':'pos'});
+  });
+
+  // Bonus/malus contextuels
+  document.getElementById('ar-ctx-list').querySelectorAll('.malus-row').forEach(function(row){
+    var lbl=row.querySelector('input[type=text]').value||'Mod.';
+    var val=+row.querySelector('input[type=number]').value||0;
+    total+=val;decomp.push({label:lbl,val:(val>0?'+':'')+val,raw:val,type:val<0?'neg':val>0?'pos':'zer'});
+  });
+
+  total=clamp(total,1,20);
+  var pct=Math.round((21-total)/20*100);pct=clamp(pct,0,100);
+  document.getElementById('ar-ra').textContent=document.getElementById('ar-name').value||'--';
+  document.getElementById('ar-sn').textContent=total;
+  var pnEl=document.getElementById('ar-pn');pnEl.textContent=pct+'%';pnEl.className='pn '+probColor(pct);
+  var pb=document.getElementById('ar-pb');pb.style.width=pct+'%';pb.style.background=pbColor(pct);
+  document.getElementById('ar-ss-wrap').style.display='block';
+  renderDecompBars('ar-sbars',decomp,total);renderDecompTable('ar-decomp',decomp,total);
+  arState._decomp=decomp;arState._total=total;arState._pct=pct;
+}
+
+function arReset(){
+  arState={diff:null,regionId:null,caracSel:null,maiPiloteId:null,maiSoutien1Id:null,maiSoutien2Id:null,persoId:null,persoCarac:null,afChecked:[]};
+  document.getElementById('ar-name').value='';
+  document.getElementById('ar-region-sel').value='';
+  document.getElementById('ar-mai-pilote').innerHTML='<option value="">-- Choisir --</option>';
+  document.getElementById('ar-mai-soutien1').innerHTML='<option value="">-- Aucune --</option>';
+  document.getElementById('ar-mai-soutien2').innerHTML='<option value="">-- Aucune --</option>';
+  document.getElementById('ar-perso-sel').innerHTML='<option value="">-- Aucun --</option>';
+  document.getElementById('ar-perso-carac').innerHTML='<option value="">-- Aucune --</option>';
+  document.getElementById('ar-cohesion-badge').innerHTML='';
+  document.getElementById('ar-mai-pilote-badge').innerHTML='';
+  document.getElementById('ar-perso-badge').innerHTML='';
+  document.querySelectorAll('#actions-region .diff-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('ar-ctx-list').innerHTML='';
+  document.getElementById('ar-forum-btn').disabled=true;
+  document.getElementById('ar-ra').textContent='--';
+  document.getElementById('ar-sn').textContent='--';
+  document.getElementById('ar-pn').textContent='--';
+  document.getElementById('ar-pb').style.width='0%';
+  document.getElementById('ar-ss-wrap').style.display='none';
+  arBuildCaracGrid();arBuildAFList();
+}
+
 // ═══════════════════════════════════════
 // GÉNÉRATEUR DE CODE FORUM
 // ═══════════════════════════════════════
@@ -2510,6 +2844,10 @@ function openForumModal(type){
     apState.afChecked.forEach(function(aid){var a=DB.af.find(function(x){return x.id===aid;});if(!a)return;var d=a.type==='atout'?-2:+2;total+=d;decomp.push({label:a.nom,val:(d>0?'+':'')+d,raw:d,type:a.type==='atout'?'neg':'pos'});});
     document.getElementById('ap-ctx-list').querySelectorAll('.malus-row').forEach(function(row){var lbl=row.querySelector('input[type=text]').value||'Mod.';var v=+row.querySelector('input[type=number]').value||0;total+=v;decomp.push({label:lbl,val:(v>0?'+':'')+v,raw:v,type:v<0?'neg':v>0?'pos':'zer'});});
     total=clamp(total,1,20);pct=clamp(Math.round((21-total)/20*100),0,100);
+  }else if(type==='region'){
+    var r2=arState.regionId?DB.regions.find(function(x){return x.id===arState.regionId;}):null;
+    name=r2?r2.nom:'';titre=document.getElementById('ar-name').value;
+    decomp=arState._decomp||[];total=arState._total||0;pct=arState._pct||0;
   }else{
     var mai=amState.maisonId?DB.maisons.find(function(x){return x.id===amState.maisonId;}):null;
     name=mai?mai.nom:'';titre=document.getElementById('am-name').value;
@@ -2669,6 +3007,7 @@ loadDB();
 renderBddRegions();
 refreshActionPersoSelects();
 refreshActionMaisonSelects();
+refreshActionRegionSelects();
 renderCaracMaison();
 renderCaracPerso();
 renderEchelles();
